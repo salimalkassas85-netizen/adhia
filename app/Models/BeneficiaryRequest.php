@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class BeneficiaryRequest extends Model
@@ -16,6 +17,7 @@ class BeneficiaryRequest extends Model
         'family_members_count',
         'has_children',
         'has_elderly',
+        'social_status',
         'full_address',
         'landmark',
         'latitude',
@@ -62,6 +64,11 @@ class BeneficiaryRequest extends Model
     public function statusLogs(): MorphMany
     {
         return $this->morphMany(StatusLog::class, 'loggable');
+    }
+
+    public function allocations(): HasMany
+    {
+        return $this->hasMany(Allocation::class);
     }
 
     public function mapsUrl(): string

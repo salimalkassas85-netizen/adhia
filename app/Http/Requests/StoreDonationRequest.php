@@ -25,7 +25,7 @@ class StoreDonationRequest extends FormRequest
         return [
             'donor_name' => ['nullable', 'string', 'max:255'],
             'donor_phone' => ['required', 'string', 'max:20'],
-            'donor_area_id' => ['nullable', 'required_if:donation_scope,own_area', 'exists:areas,id'],
+            'donor_area_id' => ['required', 'exists:areas,id'],
             'target_area_id' => ['nullable', 'required_if:donation_scope,selected_area', 'exists:areas,id'],
             'donation_scope' => ['required', 'in:own_area,selected_area,most_needed'],
             'donation_type' => ['required', 'in:meat_kg,money,sacrifice_share,full_sacrifice'],
@@ -36,6 +36,8 @@ class StoreDonationRequest extends FormRequest
             'longitude' => ['nullable', 'numeric', 'between:-180,180'],
             'location_accuracy' => ['nullable', 'integer', 'min:0', 'max:100000'],
             'notes' => ['nullable', 'string', 'max:2000'],
+            'selected_cases' => ['nullable', 'array'],
+            'selected_cases.*' => ['integer', 'exists:beneficiary_requests,id'],
         ];
     }
 }

@@ -12,6 +12,17 @@
             <div class="field"><label>عدد أفراد الأسرة</label><input name="family_members_count" type="number" min="1" max="50" value="{{ old('family_members_count') }}"></div>
         </div>
         <div class="grid grid-2">
+            <div class="field">
+                <label>الحالة الاجتماعية</label>
+                <select name="social_status">
+                    <option value="">اختياري</option>
+                    @foreach(\App\Support\ArabicLabels::socialStatusOptions() as $val => $label)
+                        <option value="{{ $val }}" @selected(old('social_status') == $val)>{{ $label }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+        <div class="grid grid-2">
             <label><input style="width:auto" type="checkbox" name="has_children" value="1" @checked(old('has_children'))> يوجد أطفال</label>
             <label><input style="width:auto" type="checkbox" name="has_elderly" value="1" @checked(old('has_elderly'))> يوجد كبار سن</label>
         </div>

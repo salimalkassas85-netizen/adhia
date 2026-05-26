@@ -30,4 +30,26 @@ class BeneficiaryRequestController extends Controller
 
         return view('public.request-success', ['code' => $giftRequest->code]);
     }
+
+    public function cases(Area $area)
+    {
+        $cases = BeneficiaryRequest::where('area_id', $area->id)
+            ->whereIn('status', ['pending', 'approved'])
+            ->withCount('allocations as received_donations_count')
+            ->orderBy('received_donations_count')
+            ->oldest()
+            ->get()
+            ->map(function ($case) {
+                return [
+                    'id' => $case->id,
+                    'family_members_count' => $case->family_members_count ?? 'غير محدد',
+                    'has_children' => $case->has_children,
+                    'has_elderly' => $case->has_elderly,
+                    'social_status' => $case->social_status ? \App\Support\ArabicLabels::socialStatus($case->social_status) : 'غير محدد',
+                    'received_donations_count' => $case->received_donations_count,
+                ];
+            });
+
+        return response()->json($cases);
+    }
 }

@@ -26,6 +26,8 @@ Route::get('/donate', [DonationController::class, 'create'])->name('public.donat
 Route::post('/donate', [DonationController::class, 'store'])->middleware('throttle:10,1')->name('public.donation.store');
 Route::get('/donation-success/{code}', [DonationController::class, 'success'])->name('public.donation.success');
 
+Route::get('/api/areas/{area}/cases', [BeneficiaryRequestController::class, 'cases'])->name('api.areas.cases');
+
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
     Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login.store');

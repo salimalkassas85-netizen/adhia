@@ -29,6 +29,7 @@ class StoreBeneficiaryRequest extends FormRequest
             'family_members_count' => ['nullable', 'integer', 'min:1', 'max:50'],
             'has_children' => ['nullable', 'boolean'],
             'has_elderly' => ['nullable', 'boolean'],
+            'social_status' => ['nullable', 'string', 'in:married,widowed,divorced,single,other'],
             'full_address' => ['required', 'string', 'max:2000'],
             'landmark' => ['nullable', 'string', 'max:255'],
             'latitude' => ['required', 'numeric', 'between:-90,90'],

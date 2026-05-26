@@ -50,9 +50,9 @@ class ArabicLabels
     public static function donationStatusOptions(): array
     {
         return [
-            'pending' => 'انتظار',
+            'pending' => 'جاري المعالجة',
             'received' => 'تم الاستلام',
-            'completed' => 'تم تسليم الهدية',
+            'completed' => 'تم التسليم',
         ];
     }
 
@@ -72,6 +72,22 @@ class ArabicLabels
             'own_area' => 'منطقته',
             'selected_area' => 'منطقة مختارة',
             'most_needed' => 'الأكثر احتياجًا للتغطية',
+        ];
+    }
+
+    public static function socialStatus(?string $status): string
+    {
+        return self::socialStatusOptions()[$status] ?? (string) $status;
+    }
+
+    public static function socialStatusOptions(): array
+    {
+        return [
+            'married' => 'متزوج/ة',
+            'widowed' => 'أرمل/ة',
+            'divorced' => 'مطلق/ة',
+            'single' => 'أعزب/عزباء',
+            'other' => 'غير ذلك',
         ];
     }
 }
