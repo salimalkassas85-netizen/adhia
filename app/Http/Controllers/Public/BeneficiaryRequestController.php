@@ -38,11 +38,19 @@ class BeneficiaryRequestController extends Controller
 
     public function cases(Area $area)
     {
-        $cases = BeneficiaryRequest::where('area_id', $area->id)
-            ->whereIn('status', ['pending', 'approved'])
-            ->whereDoesntHave('allocations')
-            ->withCount('allocations as received_donations_count')
-            ->orderBy('received_donations_count')
+        $cases = BeneficiaryRequest::query()
+            ->where('area_id', $area->id)
+            ->withCount([
+                'donations as allocated_donations_count' => fn ($query) => $query->where('donations.status', '!=', 'cancelled'),
+            ])
+            ->withSum([
+                'donations as total_money_received' => fn ($query) => $query->where('donations.status', '!=', 'cancelled'),
+            ], 'amount')
+            ->withSum([
+                'donations as total_meat_kg_received' => fn ($query) => $query->where('donations.status', '!=', 'cancelled'),
+            ], 'meat_kg')
+            ->orderBy('total_money_received')
+            ->orderBy('total_meat_kg_received')
             ->oldest()
             ->get()
             ->map(function ($case) {
@@ -52,7 +60,10 @@ class BeneficiaryRequestController extends Controller
                     'has_children' => $case->has_children,
                     'has_elderly' => $case->has_elderly,
                     'social_status' => $case->social_status ? \App\Support\ArabicLabels::socialStatus($case->social_status) : 'غير محدد',
-                    'received_donations_count' => $case->received_donations_count,
+                    'allocated_donations_count' => (int) $case->allocated_donations_count,
+                    'received_donations_count' => (int) $case->allocated_donations_count,
+                    'total_money_received' => (float) ($case->total_money_received ?? 0),
+                    'total_meat_kg_received' => (float) ($case->total_meat_kg_received ?? 0),
                 ];
             });
 

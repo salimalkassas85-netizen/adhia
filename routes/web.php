@@ -50,6 +50,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin', 'pledg
 
     // Donations
     Route::get('/donations', [AdminDonationController::class, 'index'])->name('donations.index');
+    Route::get('/needy-deliveries', [AdminDonationController::class, 'needyDeliveries'])->name('donations.needy-deliveries');
+    Route::post('/needy-deliveries/{beneficiaryRequest}/deliver', [AdminDonationController::class, 'deliverReadyToBeneficiary'])->name('donations.needy-deliveries.deliver');
     Route::get('/donations/{donation}', [AdminDonationController::class, 'show'])->name('donations.show');
     Route::post('/donations/{donation}/confirm', [AdminDonationController::class, 'confirm'])->name('donations.confirm');
     Route::post('/donations/{donation}/receive', [AdminDonationController::class, 'receive'])->name('donations.receive');

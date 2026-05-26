@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class BeneficiaryRequest extends Model
@@ -69,6 +70,13 @@ class BeneficiaryRequest extends Model
     public function allocations(): HasMany
     {
         return $this->hasMany(Allocation::class);
+    }
+
+    public function donations(): BelongsToMany
+    {
+        return $this->belongsToMany(Donation::class, 'allocations', 'beneficiary_request_id', 'donation_id')
+            ->withPivot(['area_id', 'status'])
+            ->withTimestamps();
     }
 
     public function mapsUrl(): string

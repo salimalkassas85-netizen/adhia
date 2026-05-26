@@ -360,6 +360,7 @@
 
     <footer class="footer">
         <div>الأمانة والستر وحفظ الخصوصية أساس هذه المبادرة.</div>
+        <div class="privacy">Developed by <strong>salem alkassas</strong></div>
         @auth
             <div class="privacy">
                 مسجل الدخول: <strong>{{ auth()->user()->name }}</strong>

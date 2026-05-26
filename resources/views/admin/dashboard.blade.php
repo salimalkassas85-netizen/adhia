@@ -11,6 +11,7 @@
     <div class="actions">
         <a class="btn" href="{{ route('admin.beneficiary-requests.index') }}">طلبات الهدية</a>
         <a class="btn gold" href="{{ route('admin.donations.index') }}">المساهمات</a>
+        <a class="btn" href="{{ route('admin.donations.needy-deliveries') }}">تسليمات المحتاجين</a>
     </div>
 </div>
 

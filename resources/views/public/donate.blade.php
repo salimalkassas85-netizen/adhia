@@ -21,7 +21,7 @@
                 <h2>الحالات المحتاجة في هذه المنطقة</h2>
                 <span class="badge" id="cases-count">0 حالة</span>
             </div>
-            <p class="privacy">يمكنك اختيار حالة واحدة فقط لتوجيه مساهمتك لها مباشرة. إذا لم تختر أحداً، سيتم توزيع المساهمة داخل منطقتك.</p>
+            <p class="privacy">يمكنك اختيار حالة واحدة فقط. بجانب كل حالة يظهر إجمالي ما خُصص لها من كل المساهمات السابقة والحالية غير الملغية.</p>
             <div id="cases-list" class="grid grid-2"></div>
         </div>
 
@@ -117,7 +117,7 @@ function fetchCases() {
         .then(cases => {
             casesCount.textContent = `${cases.length} حالة`;
             if (cases.length === 0) {
-                casesList.innerHTML = '<p class="privacy">لا توجد طلبات انتظار في هذه المنطقة حالياً. سيتم حفظ مساهمتك كرصيد للمنطقة للحالات القادمة.</p>';
+                casesList.innerHTML = '<p class="privacy">لا توجد حالات مسجلة في هذه المنطقة حالياً. سيتم حفظ مساهمتك كرصيد للمنطقة للحالات القادمة.</p>';
                 return;
             }
 
@@ -129,7 +129,9 @@ function fetchCases() {
                         <div>الأسرة: ${c.family_members_count} فرد</div>
                         <div>الحالة: ${c.social_status}</div>
                         <div>${c.has_children ? '✅ يوجد أطفال' : '❌ لا يوجد أطفال'} | ${c.has_elderly ? '✅ كبار سن' : '❌ لا يوجد كبار سن'}</div>
-                        <div style="margin-top:6px; color:var(--gold);">📦 تم تخصيص ${c.received_donations_count} تبرع له حتى الآن</div>
+                        <div style="margin-top:6px; color:var(--gold);">💰 إجمالي المال المخصص: ${Number(c.total_money_received || 0).toFixed(2)} جنيه</div>
+                        <div style="color:var(--gold);">🥩 إجمالي اللحم المخصص: ${Number(c.total_meat_kg_received || 0).toFixed(2)} كجم</div>
+                        <div style="color:var(--muted);">📦 عدد المساهمات المرتبطة: ${c.allocated_donations_count || 0}</div>
                     </div>
                 </label>
             `).join('');

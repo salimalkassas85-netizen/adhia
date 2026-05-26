@@ -39,11 +39,10 @@ class StoreDonationRequest extends FormRequest
             if ($this->filled('selected_case_id')) {
                 $caseExists = \App\Models\BeneficiaryRequest::whereKey($this->integer('selected_case_id'))
                     ->where('area_id', $this->integer('donor_area_id'))
-                    ->whereIn('status', ['pending', 'approved'])
                     ->exists();
 
                 if (! $caseExists) {
-                    $validator->errors()->add('selected_case_id', 'الحالة المختارة يجب أن تكون من نفس منطقتك ومتاحة للتوزيع.');
+                    $validator->errors()->add('selected_case_id', 'الحالة المختارة يجب أن تكون من نفس منطقتك.');
                 }
             }
         });

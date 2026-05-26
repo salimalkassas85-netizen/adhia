@@ -27,6 +27,46 @@ class DonationController extends Controller
         ]);
     }
 
+
+    public function needyDeliveries(Request $request, AdminAreaScope $scope)
+    {
+        $areaId = $scope->areaId();
+
+        $readyDonationFilter = function ($query) use ($areaId): void {
+            $query->where('donations.status', 'received')
+                ->when($areaId, fn ($query) => $query->where('allocations.area_id', $areaId));
+        };
+
+        $needyDeliveries = BeneficiaryRequest::query()
+            ->with('area')
+            ->when($areaId, fn ($query) => $query->where('area_id', $areaId))
+            ->whereHas('donations', $readyDonationFilter)
+            ->withCount(['donations as ready_donations_count' => $readyDonationFilter])
+            ->withSum(['donations as ready_money_total' => $readyDonationFilter], 'amount')
+            ->withSum(['donations as ready_meat_kg_total' => $readyDonationFilter], 'meat_kg')
+            ->orderBy('area_id')
+            ->orderBy('first_name')
+            ->paginate(20)
+            ->withQueryString();
+
+        return view('admin.donations.needy-deliveries', [
+            'needyDeliveries' => $needyDeliveries,
+        ]);
+    }
+
+    public function deliverReadyToBeneficiary(BeneficiaryRequest $beneficiaryRequest, DonationService $service, AdminAreaScope $scope)
+    {
+        abort_unless($scope->canAccessRequest($beneficiaryRequest), 403);
+
+        $deliveredCount = $service->deliverReadyDonationsToBeneficiary($beneficiaryRequest, $scope->areaId());
+
+        if ($deliveredCount === 0) {
+            return back()->with('status', 'لا توجد مساهمات جاهزة للتسليم لهذا المحتاج.');
+        }
+
+        return back()->with('status', "تم تسليم {$deliveredCount} مساهمة جاهزة للمحتاج مرة واحدة.");
+    }
+
     public function show(Donation $donation, AdminAreaScope $scope)
     {
         abort_unless($scope->canAccessDonation($donation), 403);
@@ -36,9 +76,8 @@ class DonationController extends Controller
         return view('admin.donations.show', [
             'donation' => $donation->load(['donorArea', 'targetArea', 'assignedAdmin', 'allocations.beneficiaryRequest.area', 'statusLogs.user']),
             'areas' => Area::where('active', true)->when($areaId, fn ($query) => $query->where('id', $areaId))->orderBy('name')->get(),
-            'requests' => BeneficiaryRequest::whereIn('status', ['pending', 'approved'])
+            'requests' => BeneficiaryRequest::query()
                 ->when($areaId, fn ($query) => $query->where('area_id', $areaId))
-                ->whereDoesntHave('allocations')
                 ->orderByDesc('created_at')
                 ->get(),
         ]);

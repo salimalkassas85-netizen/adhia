@@ -44,6 +44,10 @@
     <h2>حالة الطلب الواحدة</h2>
     <p><strong>أدمن المنطقة المسؤول:</strong> {{ $donation->assignedAdmin?->name ?? auth()->user()->name }}</p>
     <p><strong>الحالة الحالية:</strong> <x-status-badge :status="$donation->status" /></p>
+    @if($donation->status === 'received' && $beneficiary)
+        <p class="notice">هذه المساهمة جاهزة ضمن تسليمات المحتاج. لتسليم كل مخصصات نفس المحتاج مرة واحدة استخدم صفحة تسليمات المحتاجين.</p>
+        <a class="btn" href="{{ route('admin.donations.needy-deliveries') }}">فتح تسليمات المحتاجين</a>
+    @endif
 
     @if($donation->allocations->isEmpty())
         <form method="post" action="{{ route('admin.donations.allocate',$donation) }}">@csrf

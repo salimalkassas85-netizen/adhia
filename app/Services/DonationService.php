@@ -55,6 +55,26 @@ class DonationService
         return $donation;
     }
 
+
+    public function deliverReadyDonationsToBeneficiary(BeneficiaryRequest $beneficiaryRequest, ?int $areaId = null): int
+    {
+        $query = Donation::query()
+            ->where('status', 'received')
+            ->whereHas('allocations', function ($query) use ($beneficiaryRequest, $areaId): void {
+                $query->where('beneficiary_request_id', $beneficiaryRequest->id)
+                    ->when($areaId, fn ($query) => $query->where('area_id', $areaId));
+            })
+            ->where('status', '!=', 'cancelled');
+
+        $donations = $query->with('allocations.beneficiaryRequest')->get();
+
+        foreach ($donations as $donation) {
+            $this->setStatus($donation, 'completed', 'تم تسليم كل المخصصات الجاهزة للمحتاج ضمن تسليم مجمع بواسطة أدمن المنطقة.');
+        }
+
+        return $donations->count();
+    }
+
     public function allocate(Donation $donation, int $beneficiaryRequestId, int $areaId): Allocation
     {
         if ($donation->allocations()->exists()) {

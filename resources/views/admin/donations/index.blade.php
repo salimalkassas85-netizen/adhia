@@ -2,11 +2,12 @@
 @section('content')
 <div class="actions" style="justify-content:space-between">
     <h1>طلبات التوصيل والمساهمات</h1>
+    <a class="btn" href="{{ route('admin.donations.needy-deliveries') }}">تسليمات المحتاجين</a>
     <a class="btn secondary" href="{{ route('admin.dashboard') }}">لوحة الإدارة</a>
 </div>
 
 <div class="panel">
-    <p class="notice">كل مساهمة مرتبطة بحالة تعتبر طلب توصيل واحد: استلام من المتبرع ثم تسليم للمحتاج. المسؤول هو أدمن المنطقة مباشرة.</p>
+    <p class="notice">كل مساهمة مرتبطة بحالة تعتبر طلب استلام من المتبرع. بعد الاستلام تظهر في صفحة تسليمات المحتاجين لتسليم كل المخصصات الجاهزة لنفس المحتاج مرة واحدة.</p>
     <div class="actions">
         <a class="btn {{ $selectedStatus ? 'secondary' : '' }}" href="{{ route('admin.donations.index') }}">الكل</a>
         @foreach(\App\Support\ArabicLabels::donationStatusOptions() as $status => $label)
