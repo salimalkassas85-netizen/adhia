@@ -3,17 +3,27 @@
 <div class="panel">
     <h1>المساهمة في هدية العيد</h1>
     <p class="privacy">تصل مساهمتك عبر أدمن المنطقة المسؤول دون كشف بيانات المحتاج للمتبرع.</p>
+    @if ($errors->any())
+        <div class="errors" style="margin-bottom:14px;">
+            <strong>من فضلك راجع البيانات التالية:</strong>
+            <ul style="margin:8px 0 0; padding-right:18px;">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
     <form method="post" action="{{ route('public.donation.store') }}" id="donation-form">
         @csrf
         <div class="grid grid-2">
-            <div class="field"><label>اسم المساهم (اختياري)</label><input name="donor_name" value="{{ old('donor_name') }}"></div>
-            <div class="field"><label>رقم الهاتف</label><input name="donor_phone" value="{{ old('donor_phone') }}" required></div>
-            <div class="field"><label>منطقتك</label><select name="donor_area_id" required><option value="">اختر المنطقة</option>@foreach($areas as $area)<option value="{{ $area->id }}" @selected(old('donor_area_id') == $area->id)>{{ $area->name }}</option>@endforeach</select></div>
+            <div class="field"><label>اسم المساهم (اختياري)</label><input name="donor_name" value="{{ old('donor_name') }}">@error('donor_name')<p class="errors">{{ $message }}</p>@enderror</div>
+            <div class="field"><label>رقم الهاتف</label><input name="donor_phone" value="{{ old('donor_phone') }}" required>@error('donor_phone')<p class="errors">{{ $message }}</p>@enderror</div>
+            <div class="field"><label>منطقتك</label><select name="donor_area_id" required><option value="">اختر المنطقة</option>@foreach($areas as $area)<option value="{{ $area->id }}" @selected(old('donor_area_id') == $area->id)>{{ $area->name }}</option>@endforeach</select>@error('donor_area_id')<p class="errors">{{ $message }}</p>@enderror</div>
             <input type="hidden" name="donation_scope" value="own_area">
             <div class="field"><label>نطاق المساهمة</label><input value="منطقتي فقط" disabled></div>
-            <div class="field"><label>نوع المساهمة</label><select name="donation_type" required><option value="meat_kg">لحم بالكيلو</option><option value="money">مبلغ مالي</option><option value="sacrifice_share">سهم أضحية</option><option value="full_sacrifice">أضحية كاملة</option></select></div>
-            <div class="field"><label>المبلغ</label><input name="amount" type="number" step="0.01" min="1" value="{{ old('amount') }}"></div>
-            <div class="field"><label>كمية اللحم بالكيلو</label><input name="meat_kg" type="number" step="0.01" min="1" value="{{ old('meat_kg') }}"></div>
+            <div class="field"><label>نوع المساهمة</label><select name="donation_type" required><option value="meat_kg" @selected(old('donation_type') === 'meat_kg')>لحم بالكيلو</option><option value="money" @selected(old('donation_type') === 'money')>مبلغ مالي</option><option value="sacrifice_share" @selected(old('donation_type') === 'sacrifice_share')>سهم أضحية</option><option value="full_sacrifice" @selected(old('donation_type') === 'full_sacrifice')>أضحية كاملة</option></select>@error('donation_type')<p class="errors">{{ $message }}</p>@enderror</div>
+            <div class="field"><label>المبلغ</label><input name="amount" type="number" step="0.01" min="1" value="{{ old('amount') }}">@error('amount')<p class="errors">{{ $message }}</p>@enderror</div>
+            <div class="field"><label>كمية اللحم بالكيلو</label><input name="meat_kg" type="number" step="0.01" min="1" value="{{ old('meat_kg') }}">@error('meat_kg')<p class="errors">{{ $message }}</p>@enderror</div>
         </div>
 
         <div id="cases-container" class="panel" style="display:none; margin-bottom:14px; background:var(--soft);">
@@ -27,14 +37,14 @@
             <div id="cases-list" class="grid grid-2"></div>
         </div>
 
-        <div class="field"><label>عنوان الاستلام (اختياري)</label><textarea name="pickup_address">{{ old('pickup_address') }}</textarea></div>
+        <div class="field"><label>عنوان الاستلام (اختياري)</label><textarea name="pickup_address">{{ old('pickup_address') }}</textarea>@error('pickup_address')<p class="errors">{{ $message }}</p>@enderror</div>
         <input type="hidden" name="latitude" id="donor_latitude" value="{{ old('latitude') }}">
         <input type="hidden" name="longitude" id="donor_longitude" value="{{ old('longitude') }}">
         <input type="hidden" name="location_accuracy" id="donor_location_accuracy" value="{{ old('location_accuracy') }}">
         <button type="button" class="btn secondary" id="pickup-btn">تحديد موقعي الحالي للاستلام</button>
         <p class="hint" id="pickup-message">اختياري عند وجود استلام من موقعك. لن تكتب الإحداثيات يدويًا.</p>
         <div id="pickup-map" class="map"></div>
-        <div class="field"><label>ملاحظات</label><textarea name="notes">{{ old('notes') }}</textarea></div>
+        <div class="field"><label>ملاحظات</label><textarea name="notes">{{ old('notes') }}</textarea>@error('notes')<p class="errors">{{ $message }}</p>@enderror</div>
         <div class="actions"><button type="submit" id="submit-donation" disabled>تسجيل المساهمة</button></div>
     </form>
 </div>

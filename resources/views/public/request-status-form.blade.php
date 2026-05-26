@@ -10,6 +10,7 @@
             <div class="field">
                 <label for="code">رقم الطلب</label>
                 <input id="code" name="code" value="{{ old('code') }}" placeholder="مثال: REQ-XXXX" required>
+                @error('code')<p class="errors">{{ $message }}</p>@enderror
                 <p class="hint">رقم الطلب ظهر لك بعد تسجيل طلب هدية العيد.</p>
             </div>
             <button type="submit">عرض حالة الطلب</button>

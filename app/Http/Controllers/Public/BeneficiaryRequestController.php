@@ -48,9 +48,19 @@ class BeneficiaryRequestController extends Controller
             'code' => ['required', 'string', 'max:50'],
         ], [
             'code.required' => 'من فضلك أدخل رقم الطلب.',
+            'code.string' => 'رقم الطلب غير صحيح.',
+            'code.max' => 'رقم الطلب غير صحيح.',
         ]);
 
         $code = trim($validated['code']);
+
+        $exists = BeneficiaryRequest::where('code', $code)->exists();
+
+        if (! $exists) {
+            return back()
+                ->withInput()
+                ->withErrors(['code' => 'رقم الطلب غير موجود. من فضلك تأكد من الرقم وحاول مرة أخرى.']);
+        }
 
         return redirect()->route('public.request.status.show', $code);
     }
@@ -60,7 +70,13 @@ class BeneficiaryRequestController extends Controller
         $giftRequest = BeneficiaryRequest::query()
             ->with(['area', 'allocations.donation' => fn ($query) => $query->latest()])
             ->where('code', $code)
-            ->firstOrFail();
+            ->first();
+
+        if (! $giftRequest) {
+            return redirect()
+                ->route('public.request.status.form')
+                ->withErrors(['code' => 'رقم الطلب غير موجود. من فضلك تأكد من الرقم وحاول مرة أخرى.']);
+        }
 
         $donations = $giftRequest->allocations
             ->pluck('donation')
