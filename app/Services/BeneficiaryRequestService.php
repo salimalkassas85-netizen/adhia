@@ -26,27 +26,6 @@ class BeneficiaryRequestService
         return $request;
     }
 
-    public function approve(BeneficiaryRequest $request, ?string $note = null): BeneficiaryRequest
-    {
-        return $this->setStatus($request, 'approved', $note, ['approved_at' => now()]);
-    }
-
-    public function assign(BeneficiaryRequest $request, User $agent, ?string $note = null): BeneficiaryRequest
-    {
-        $from = $request->status;
-
-        $request->forceFill([
-            'assigned_agent_id' => $agent->id,
-            'status' => 'approved',
-            'assigned_at' => now(),
-            'admin_notes' => $note ?: $request->admin_notes,
-        ])->save();
-
-        $this->logs->log($request, $from, 'approved', $note);
-
-        return $request;
-    }
-
     public function setStatus(BeneficiaryRequest $request, string $status, ?string $note = null, array $extra = []): BeneficiaryRequest
     {
         $from = $request->status;

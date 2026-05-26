@@ -21,6 +21,10 @@ class DonationPolicy
                 || (int) $donation->donor_area_id === (int) $user->area_id;
         }
 
+        if ($user->isAgent()) {
+            return (int) $donation->assigned_agent_id === (int) $user->id;
+        }
+
         return false;
     }
 

@@ -63,6 +63,11 @@ class User extends Authenticatable
         return $this->hasMany(BeneficiaryRequest::class, 'assigned_agent_id');
     }
 
+    public function assignedDonations(): HasMany
+    {
+        return $this->hasMany(Donation::class, 'assigned_agent_id');
+    }
+
     public function adminNotifications(): HasMany
     {
         return $this->hasMany(AdminNotification::class);
@@ -93,6 +98,6 @@ class User extends Authenticatable
             return 'أدمن منطقة';
         }
 
-        return 'عضو توزيع';
+        return 'مستخدم';
     }
 }

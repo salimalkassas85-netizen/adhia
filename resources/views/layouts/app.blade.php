@@ -315,7 +315,6 @@
                         <a href="{{ route('admin.dashboard') }}">لوحة الإدارة</a>
                         <a href="{{ route('admin.beneficiary-requests.index') }}">طلبات الهدية</a>
                         <a href="{{ route('admin.donations.index') }}">المساهمات</a>
-                        <a href="{{ route('admin.agents.index') }}">فريق التوزيع</a>
                         @if(auth()->user()->isSuperAdmin())
                             <a href="{{ route('admin.admin-users.index') }}">أدمنز المناطق</a>
                             <a href="{{ route('admin.areas.index') }}">المناطق</a>
@@ -332,14 +331,13 @@
                             @endif
                         </a>
                     @else
-                        <a href="{{ route('agent.dashboard') }}">لوحة التوزيع</a>
-                        <a href="{{ route('agent.requests.index') }}">طلبات مسندة</a>
+                        <a href="{{ route('home') }}">الرئيسية</a>
                     @endif
                     <form method="post" action="{{ route('logout') }}">@csrf<button class="btn secondary" type="submit">خروج</button></form>
                 @else
                     <a href="{{ route('public.request.create') }}">طلب هدية العيد</a>
                     <a href="{{ route('public.donation.create') }}">المساهمة</a>
-                    <a href="{{ route('login') }}">دخول الفريق</a>
+                    <a href="{{ route('login') }}">دخول الإدارة</a>
                 @endauth
             </div>
         </nav>

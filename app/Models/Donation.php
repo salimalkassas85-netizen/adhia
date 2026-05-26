@@ -25,6 +25,10 @@ class Donation extends Model
         'location_accuracy',
         'status',
         'assigned_admin_id',
+        'assigned_agent_id',
+        'assigned_at',
+        'admin_notes',
+        'agent_notes',
         'notes',
     ];
 
@@ -35,6 +39,7 @@ class Donation extends Model
             'meat_kg' => 'decimal:2',
             'latitude' => 'decimal:7',
             'longitude' => 'decimal:7',
+            'assigned_at' => 'datetime',
         ];
     }
 
@@ -56,6 +61,11 @@ class Donation extends Model
     public function assignedAdmin(): BelongsTo
     {
         return $this->belongsTo(User::class, 'assigned_admin_id');
+    }
+
+    public function assignedAgent(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'assigned_agent_id');
     }
 
     public function statusLogs(): MorphMany

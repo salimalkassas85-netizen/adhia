@@ -23,7 +23,7 @@ class NewDonationAssigned extends Notification
     {
         return [
             'title' => 'مساهمة جديدة',
-            'body' => "تم إسناد مساهمة جديدة ({$this->donation->code}) لمنطقتك.",
+            'body' => "مساهمة جديدة ({$this->donation->code}) في منطقتك. المطلوب الاستلام من المتبرع والتسليم للحالة المختارة.",
             'url' => route('admin.donations.show', $this->donation),
             'type' => 'donation',
             'donation_id' => $this->donation->id,

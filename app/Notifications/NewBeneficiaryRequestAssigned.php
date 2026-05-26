@@ -23,7 +23,7 @@ class NewBeneficiaryRequestAssigned extends Notification
     {
         return [
             'title' => 'طلب هدية جديد',
-            'body' => "تم إسناد طلب هدية جديد ({$this->beneficiaryRequest->code}) لمنطقتك.",
+            'body' => "طلب هدية جديد ({$this->beneficiaryRequest->code}) في منطقتك. عند ربطه بمساهمة ستكون مسؤولًا عن الاستلام والتسليم.",
             'url' => route('admin.beneficiary-requests.show', $this->beneficiaryRequest),
             'type' => 'beneficiary_request',
             'request_id' => $this->beneficiaryRequest->id,

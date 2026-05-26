@@ -26,15 +26,21 @@ class BeneficiaryRequestController extends Controller
 
     public function success(string $code)
     {
-        $giftRequest = BeneficiaryRequest::where('code', $code)->firstOrFail();
+        $giftRequest = BeneficiaryRequest::with('allocations.donation.assignedAdmin')->where('code', $code)->firstOrFail();
+        $linkedDonation = $giftRequest->allocations->first()?->donation;
 
-        return view('public.request-success', ['code' => $giftRequest->code]);
+        return view('public.request-success', [
+            'code' => $giftRequest->code,
+            'status' => $linkedDonation?->status ?? $giftRequest->status,
+            'linkedDonation' => $linkedDonation,
+        ]);
     }
 
     public function cases(Area $area)
     {
         $cases = BeneficiaryRequest::where('area_id', $area->id)
             ->whereIn('status', ['pending', 'approved'])
+            ->whereDoesntHave('allocations')
             ->withCount('allocations as received_donations_count')
             ->orderBy('received_donations_count')
             ->oldest()

@@ -17,7 +17,7 @@ class DonationController extends Controller
     public function index(Request $request, AdminAreaScope $scope)
     {
         $donations = $scope->donations()
-            ->with(['donorArea', 'targetArea'])
+            ->with(['donorArea', 'targetArea', 'assignedAdmin', 'allocations.beneficiaryRequest.area'])
             ->when($request->filled('status'), fn ($query) => $query->where('status', $request->query('status')))
             ->latest();
 
@@ -34,11 +34,11 @@ class DonationController extends Controller
         $areaId = $scope->areaId();
 
         return view('admin.donations.show', [
-            'donation' => $donation->load(['donorArea', 'targetArea', 'allocations.beneficiaryRequest', 'statusLogs.user']),
+            'donation' => $donation->load(['donorArea', 'targetArea', 'assignedAdmin', 'allocations.beneficiaryRequest.area', 'statusLogs.user']),
             'areas' => Area::where('active', true)->when($areaId, fn ($query) => $query->where('id', $areaId))->orderBy('name')->get(),
-            'agents' => $scope->agents()->orderBy('name')->get(),
             'requests' => BeneficiaryRequest::whereIn('status', ['pending', 'approved'])
                 ->when($areaId, fn ($query) => $query->where('area_id', $areaId))
+                ->whereDoesntHave('allocations')
                 ->orderByDesc('created_at')
                 ->get(),
         ]);
@@ -47,17 +47,17 @@ class DonationController extends Controller
     public function confirm(Donation $donation, DonationService $service, AdminAreaScope $scope)
     {
         abort_unless($scope->canAccessDonation($donation), 403);
-        $service->setStatus($donation, 'received');
+        $service->setStatus($donation, 'received', 'تم الاستلام من المتبرع بواسطة أدمن المنطقة.');
 
-        return back()->with('status', 'تم تسجيل استلام المساهمة.');
+        return back()->with('status', 'تم تسجيل الاستلام من المتبرع.');
     }
 
     public function receive(Donation $donation, DonationService $service, AdminAreaScope $scope)
     {
         abort_unless($scope->canAccessDonation($donation), 403);
-        $service->setStatus($donation, 'received');
+        $service->setStatus($donation, 'received', 'تم الاستلام من المتبرع بواسطة أدمن المنطقة.');
 
-        return back()->with('status', 'تم تسجيل الاستلام.');
+        return back()->with('status', 'تم تسجيل الاستلام من المتبرع.');
     }
 
     public function allocate(AllocateDonationRequest $request, Donation $donation, DonationService $service, AdminAreaScope $scope)
@@ -70,7 +70,7 @@ class DonationController extends Controller
 
         $service->allocate($donation, $request->integer('beneficiary_request_id'), $request->integer('area_id'));
 
-        return back()->with('status', 'تم تخصيص المساهمة.');
+        return back()->with('status', 'تم ربط المساهمة بطلب هدية واحد.');
     }
 
     public function status(UpdateDonationStatusRequest $request, Donation $donation, DonationService $service, AdminAreaScope $scope)
@@ -78,7 +78,7 @@ class DonationController extends Controller
         abort_unless($scope->canAccessDonation($donation), 403);
         $service->setStatus($donation, $request->validated('status'), $request->validated('note'));
 
-        return back()->with('status', 'تم تحديث حالة المساهمة.');
+        return back()->with('status', 'تم تحديث حالة طلب التوصيل.');
     }
 
     /**

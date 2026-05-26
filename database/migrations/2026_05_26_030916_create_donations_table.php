@@ -28,6 +28,10 @@ return new class extends Migration
             $table->unsignedInteger('location_accuracy')->nullable();
             $table->enum('status', ['pending', 'received', 'completed'])->default('pending');
             $table->foreignId('assigned_admin_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('assigned_agent_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->timestamp('assigned_at')->nullable();
+            $table->text('admin_notes')->nullable();
+            $table->text('agent_notes')->nullable();
             $table->text('notes')->nullable();
             $table->timestamps();
         });

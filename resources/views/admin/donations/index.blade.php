@@ -1,11 +1,12 @@
 @extends('layouts.app')
 @section('content')
 <div class="actions" style="justify-content:space-between">
-    <h1>المساهمات والمتبرعون</h1>
+    <h1>طلبات التوصيل والمساهمات</h1>
     <a class="btn secondary" href="{{ route('admin.dashboard') }}">لوحة الإدارة</a>
 </div>
 
 <div class="panel">
+    <p class="notice">كل مساهمة مرتبطة بحالة تعتبر طلب توصيل واحد: استلام من المتبرع ثم تسليم للمحتاج. المسؤول هو أدمن المنطقة مباشرة.</p>
     <div class="actions">
         <a class="btn {{ $selectedStatus ? 'secondary' : '' }}" href="{{ route('admin.donations.index') }}">الكل</a>
         @foreach(\App\Support\ArabicLabels::donationStatusOptions() as $status => $label)
@@ -16,22 +17,24 @@
 
 <div class="table-responsive">
 <table class="table">
-    <thead><tr><th>الرمز</th><th>المتبرع</th><th>الهاتف</th><th>منطقة المتبرع</th><th>منطقة التوزيع</th><th>النوع</th><th>الحالة</th><th>موقع الاستلام</th><th></th></tr></thead>
+    <thead><tr><th>الرمز</th><th>المتبرع</th><th>الهاتف</th><th>المنطقة</th><th>المحتاج المرتبط</th><th>النوع</th><th>الحالة</th><th>أدمن المنطقة</th><th>موقع الاستلام</th><th></th></tr></thead>
     <tbody>
     @forelse($donations as $donation)
+        @php $beneficiary = $donation->allocations->first()?->beneficiaryRequest; @endphp
         <tr>
             <td>{{ $donation->code }}</td>
             <td>{{ $donation->donor_name ?? 'فاعل خير' }}</td>
             <td><a href="tel:{{ $donation->donor_phone }}">{{ $donation->donor_phone }}</a></td>
-            <td>{{ $donation->donorArea?->name ?? 'غير محددة' }}</td>
-            <td>{{ $donation->targetArea?->name ?? 'تحتاج تخصيص' }}</td>
+            <td>{{ $donation->targetArea?->name ?? $donation->donorArea?->name ?? 'غير محددة' }}</td>
+            <td>{{ $beneficiary?->first_name ? $beneficiary->first_name.' - '.$beneficiary->code : 'لم يحدد بعد' }}</td>
             <td><x-donation-type :type="$donation->donation_type" /></td>
             <td><x-status-badge :status="$donation->status" /></td>
+            <td>{{ $donation->assignedAdmin?->name ?? 'لم يتم تحديده' }}</td>
             <td>@if($donation->pickupMapsUrl())<a target="_blank" rel="noopener" href="{{ $donation->pickupMapsUrl() }}">فتح</a>@else - @endif</td>
             <td><a class="btn secondary" href="{{ route('admin.donations.show',$donation) }}">إدارة</a></td>
         </tr>
     @empty
-        <tr><td colspan="9">لا توجد مساهمات مطابقة.</td></tr>
+        <tr><td colspan="10">لا توجد مساهمات مطابقة.</td></tr>
     @endforelse
     </tbody>
 </table>

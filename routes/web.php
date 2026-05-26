@@ -1,14 +1,11 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminUserController;
-use App\Http\Controllers\Admin\AgentController;
 use App\Http\Controllers\Admin\AreaController;
 use App\Http\Controllers\Admin\BeneficiaryRequestController as AdminBeneficiaryRequestController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\DonationController as AdminDonationController;
 use App\Http\Controllers\Admin\NotificationController;
-use App\Http\Controllers\Agent\AssignedRequestController;
-use App\Http\Controllers\Agent\DashboardController as AgentDashboardController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\PledgeController;
 use App\Http\Controllers\Public\BeneficiaryRequestController;
@@ -42,7 +39,6 @@ Route::middleware('auth')->group(function () {
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin', 'pledge.accepted'])->group(function () {
     Route::get('/dashboard', AdminDashboardController::class)->name('dashboard');
-    Route::resource('agents', AgentController::class)->parameters(['agents' => 'agent']);
 
     // Super admin only routes
     Route::resource('areas', AreaController::class)->middleware('global.admin');
@@ -51,9 +47,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin', 'pledg
     // Beneficiary requests
     Route::get('/beneficiary-requests', [AdminBeneficiaryRequestController::class, 'index'])->name('beneficiary-requests.index');
     Route::get('/beneficiary-requests/{beneficiaryRequest}', [AdminBeneficiaryRequestController::class, 'show'])->name('beneficiary-requests.show');
-    Route::post('/beneficiary-requests/{beneficiaryRequest}/approve', [AdminBeneficiaryRequestController::class, 'approve'])->name('beneficiary-requests.approve');
-    Route::post('/beneficiary-requests/{beneficiaryRequest}/assign', [AdminBeneficiaryRequestController::class, 'assign'])->name('beneficiary-requests.assign');
-    Route::post('/beneficiary-requests/{beneficiaryRequest}/status', [AdminBeneficiaryRequestController::class, 'status'])->name('beneficiary-requests.status');
 
     // Donations
     Route::get('/donations', [AdminDonationController::class, 'index'])->name('donations.index');
@@ -72,9 +65,3 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin', 'pledg
     Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllRead');
 });
 
-Route::prefix('agent')->name('agent.')->middleware(['auth', 'role:agent', 'pledge.accepted'])->group(function () {
-    Route::get('/dashboard', AgentDashboardController::class)->name('dashboard');
-    Route::get('/requests', [AssignedRequestController::class, 'index'])->name('requests.index');
-    Route::get('/requests/{beneficiaryRequest}', [AssignedRequestController::class, 'show'])->name('requests.show');
-    Route::post('/requests/{beneficiaryRequest}/status', [AssignedRequestController::class, 'status'])->name('requests.status');
-});

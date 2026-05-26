@@ -33,7 +33,7 @@
                 <path d="M9 13h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
             </svg>
         </div>
-        <p class="giving-caption">المساهمة تصل عبر فريق التوزيع بستـر وخصوصية، دون كشف بيانات أي طرف للآخر.</p>
+        <p class="giving-caption">المساهمة تصل عبر أدمن المنطقة بستـر وخصوصية، دون كشف بيانات أي طرف للآخر.</p>
     </div>
 </section>
 
@@ -43,6 +43,6 @@
         <div class="stat"><strong>{{ $donationsCount }}</strong><span>مساهمات</span></div>
         <div class="stat"><strong>{{ $deliveredCount }}</strong><span>هدايا مسلمة</span></div>
     </div>
-    <p class="privacy">لا يظهر اسم المتبرع للمستفيد، ولا تظهر بيانات المستفيد للمتبرع. بيانات الموقع لا يطلع عليها إلا الإدارة وفريق التوزيع المعتمد عند الإسناد.</p>
+    <p class="privacy">لا يظهر اسم المتبرع للمستفيد، ولا تظهر بيانات المستفيد للمتبرع. بيانات الموقع لا يطلع عليها إلا الإدارة وأدمن المنطقة المسؤول عن الاستلام والتسليم.</p>
 </section>
 @endsection

@@ -26,12 +26,12 @@ class AdminAssignmentService
             return null;
         }
 
-        $request->forceFill(['assigned_admin_id' => $admin->id])->save();
+        $request->forceFill(['assigned_admin_id' => $admin->id, 'assigned_at' => now()])->save();
         $admin->notify(new NewBeneficiaryRequestAssigned($request));
 
         $this->notifySuperAdmins(
             'طلب هدية جديد',
-            "تم استقبال طلب هدية جديد ({$request->code}) وإسناده لأدمن المنطقة.",
+            "تم استقبال طلب هدية جديد ({$request->code}) وتوجيهه لأدمن المنطقة المسؤول عن الاستلام والتسليم.",
             route('admin.beneficiary-requests.show', $request),
         );
 
@@ -67,13 +67,14 @@ class AdminAssignmentService
         $donation->forceFill([
             'target_area_id' => $donation->target_area_id ?: $areaId,
             'assigned_admin_id' => $admin->id,
+            'assigned_at' => now(),
         ])->save();
 
         $admin->notify(new NewDonationAssigned($donation));
 
         $this->notifySuperAdmins(
             'مساهمة جديدة',
-            "تم استقبال مساهمة جديدة ({$donation->code}) وإسنادها لأدمن المنطقة.",
+            "تم استقبال مساهمة جديدة ({$donation->code}) وتوجيهها لأدمن المنطقة المسؤول عن الاستلام والتسليم.",
             route('admin.donations.show', $donation),
         );
 
@@ -89,10 +90,6 @@ class AdminAssignmentService
     {
         if ($donation->donation_scope === 'own_area') {
             return $donation->donor_area_id;
-        }
-
-        if ($donation->donation_scope === 'selected_area') {
-            return $donation->target_area_id;
         }
 
         if ($donation->target_area_id) {

@@ -25,7 +25,7 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(Auth::user()->isAdmin() ? route('admin.dashboard') : route('agent.dashboard'));
+        return redirect()->intended(Auth::user()->isAdmin() ? route('admin.dashboard') : route('home'));
     }
 
     public function destroy(Request $request)

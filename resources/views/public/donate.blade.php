@@ -2,15 +2,15 @@
 @section('content')
 <div class="panel">
     <h1>المساهمة في هدية العيد</h1>
-    <p class="privacy">تصل مساهمتك عبر الإدارة وفريق التوزيع دون كشف أسماء مستحقي الهدية أو بياناتهم.</p>
+    <p class="privacy">تصل مساهمتك عبر أدمن المنطقة المسؤول دون كشف بيانات المحتاج للمتبرع.</p>
     <form method="post" action="{{ route('public.donation.store') }}">
         @csrf
         <div class="grid grid-2">
             <div class="field"><label>اسم المساهم (اختياري)</label><input name="donor_name" value="{{ old('donor_name') }}"></div>
             <div class="field"><label>رقم الهاتف</label><input name="donor_phone" value="{{ old('donor_phone') }}" required></div>
             <div class="field"><label>منطقتك</label><select name="donor_area_id" required><option value="">اختر المنطقة</option>@foreach($areas as $area)<option value="{{ $area->id }}" @selected(old('donor_area_id') == $area->id)>{{ $area->name }}</option>@endforeach</select></div>
-            <div class="field"><label>نطاق المساهمة</label><select name="donation_scope" required><option value="own_area">منطقتي</option><option value="selected_area">منطقة أخرى</option><option value="most_needed">الأكثر احتياجًا للتغطية</option></select></div>
-            <div class="field"><label>المنطقة المختارة</label><select name="target_area_id"><option value="">اختر عند اختيار منطقة أخرى</option>@foreach($areas as $area)<option value="{{ $area->id }}" @selected(old('target_area_id') == $area->id)>{{ $area->name }}</option>@endforeach</select></div>
+            <input type="hidden" name="donation_scope" value="own_area">
+            <div class="field"><label>نطاق المساهمة</label><input value="منطقتي فقط" disabled></div>
             <div class="field"><label>نوع المساهمة</label><select name="donation_type" required><option value="meat_kg">لحم بالكيلو</option><option value="money">مبلغ مالي</option><option value="sacrifice_share">سهم أضحية</option><option value="full_sacrifice">أضحية كاملة</option></select></div>
             <div class="field"><label>المبلغ</label><input name="amount" type="number" step="0.01" min="1" value="{{ old('amount') }}"></div>
             <div class="field"><label>كمية اللحم بالكيلو</label><input name="meat_kg" type="number" step="0.01" min="1" value="{{ old('meat_kg') }}"></div>
@@ -21,7 +21,7 @@
                 <h2>الحالات المحتاجة في هذه المنطقة</h2>
                 <span class="badge" id="cases-count">0 حالة</span>
             </div>
-            <p class="privacy">يمكنك اختيار حالة أو أكثر لتوجيه تبرعك لهم مباشرة. إذا لم تختر أحداً، سيتم توزيع التبرع للأكثر احتياجاً.</p>
+            <p class="privacy">يمكنك اختيار حالة واحدة فقط لتوجيه مساهمتك لها مباشرة. إذا لم تختر أحداً، سيتم توزيع المساهمة داخل منطقتك.</p>
             <div id="cases-list" class="grid grid-2"></div>
         </div>
 
@@ -94,19 +94,14 @@ document.getElementById('pickup-btn').addEventListener('click', () => {
 
 initPickupMap();
 
-const scopeSelect = document.querySelector('select[name="donation_scope"]');
 const donorAreaSelect = document.querySelector('select[name="donor_area_id"]');
-const targetAreaSelect = document.querySelector('select[name="target_area_id"]');
 const casesContainer = document.getElementById('cases-container');
 const casesList = document.getElementById('cases-list');
 const casesCount = document.getElementById('cases-count');
 
 function fetchCases() {
     let areaId = null;
-    const scope = scopeSelect.value;
-    
-    if (scope === 'own_area') areaId = donorAreaSelect.value;
-    else if (scope === 'selected_area') areaId = targetAreaSelect.value;
+    areaId = donorAreaSelect.value;
     
     if (!areaId) {
         casesContainer.style.display = 'none';
@@ -128,7 +123,7 @@ function fetchCases() {
 
             casesList.innerHTML = cases.map(c => `
                 <label class="card" style="display:block; cursor:pointer; background:#fff;">
-                    <input type="checkbox" name="selected_cases[]" value="${c.id}" style="width:auto; margin-left:8px;">
+                    <input type="radio" name="selected_case_id" value="${c.id}" style="width:auto; margin-left:8px;">
                     <strong>مستفيد #${c.id}</strong>
                     <div style="font-size:13px; color:var(--muted); margin-top:4px;">
                         <div>الأسرة: ${c.family_members_count} فرد</div>
@@ -144,9 +139,7 @@ function fetchCases() {
         });
 }
 
-scopeSelect.addEventListener('change', fetchCases);
 donorAreaSelect.addEventListener('change', fetchCases);
-targetAreaSelect.addEventListener('change', fetchCases);
 
 // Initial fetch if values are pre-selected
 fetchCases();

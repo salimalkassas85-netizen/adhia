@@ -15,6 +15,6 @@ class PledgeController extends Controller
     {
         $request->user()->forceFill(['pledge_accepted_at' => now()])->save();
 
-        return redirect($request->user()->isAdmin() ? route('admin.dashboard') : route('agent.dashboard'));
+        return redirect($request->user()->isAdmin() ? route('admin.dashboard') : route('home'));
     }
 }

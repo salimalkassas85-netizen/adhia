@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @php
-    $requestStatuses = \App\Support\ArabicLabels::beneficiaryStatusOptions();
+    $linkedDonation = $request->allocations->first()?->donation;
 @endphp
 @section('content')
 <div class="grid grid-2">
@@ -9,7 +9,7 @@
         <p><strong>الاسم الأول:</strong> {{ $request->first_name }}</p>
         <p><strong>الهاتف:</strong> <a href="tel:{{ $request->phone }}">{{ $request->phone }}</a></p>
         <p><strong>المنطقة:</strong> {{ $request->area?->name }}</p>
-        <p><strong>الحالة:</strong> <x-status-badge :status="$request->status" /></p>
+        <p><strong>حالة طلب التوصيل:</strong> <x-status-badge :status="$linkedDonation?->status ?? $request->status" /></p>
         <p><strong>عدد أفراد الأسرة:</strong> {{ $request->family_members_count ?? 'غير محدد' }}</p>
         <p><strong>أطفال:</strong> {{ $request->has_children ? 'نعم' : 'لا' }} | <strong>كبار سن:</strong> {{ $request->has_elderly ? 'نعم' : 'لا' }}</p>
         <p><strong>العنوان:</strong> {{ $request->full_address }}</p>
@@ -18,27 +18,17 @@
         <div id="beneficiary-map" class="map" style="margin-top:14px"></div>
     </div>
     <div class="panel">
-        <h2>إجراءات الإدارة</h2>
-        <form method="post" action="{{ route('admin.beneficiary-requests.approve',$request) }}">@csrf<button>اعتماد الطلب</button></form>
-        <hr>
-        <form method="post" action="{{ route('admin.beneficiary-requests.assign',$request) }}">@csrf
-            <div class="field"><label>إسناد إلى</label><select name="assigned_agent_id" required>@foreach($agents as $agent)<option value="{{ $agent->id }}">{{ $agent->name }}</option>@endforeach</select></div>
-            <div class="field"><label>ملاحظة إدارية</label><textarea name="admin_notes">{{ old('admin_notes',$request->admin_notes) }}</textarea></div>
-            <button>إسناد</button>
-        </form>
-        <hr>
-        <form method="post" action="{{ route('admin.beneficiary-requests.status',$request) }}">@csrf
-            <div class="field">
-                <label>تحديث الحالة</label>
-                <select name="status">
-                    @foreach($requestStatuses as $status => $label)
-                        <option value="{{ $status }}" @selected($request->status === $status)>{{ $label }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="field"><label>ملاحظة</label><textarea name="note"></textarea></div>
-            <button>تحديث</button>
-        </form>
+        <h2>طلب التوصيل المرتبط</h2>
+        @if($linkedDonation)
+            <p class="notice">هذا الطلب مرتبط بمساهمة واحدة. أدمن المنطقة هو المسؤول عن الاستلام من المتبرع والتسليم للمحتاج.</p>
+            <p><strong>رمز المساهمة:</strong> {{ $linkedDonation->code }}</p>
+            <p><strong>المتبرع:</strong> {{ $linkedDonation->donor_name ?? 'فاعل خير' }}</p>
+            <p><strong>هاتف المتبرع:</strong> <a href="tel:{{ $linkedDonation->donor_phone }}">{{ $linkedDonation->donor_phone }}</a></p>
+            <p><strong>حالة الطلب:</strong> <x-status-badge :status="$linkedDonation->status" /></p>
+            <a class="btn" href="{{ route('admin.donations.show', $linkedDonation) }}">إدارة طلب التوصيل</a>
+        @else
+            <p class="notice">لم يتم ربط الطلب بمساهمة بعد. لا يوجد إجراء هنا؛ الربط يتم عند اختيار المتبرع للحالة أو من صفحة المساهمة.</p>
+        @endif
     </div>
 </div>
 <div class="panel" style="margin-top:18px">

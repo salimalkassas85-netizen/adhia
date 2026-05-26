@@ -2,7 +2,7 @@
 @section('content')
 <div class="panel">
     <h1>طلب هدية العيد بسرية وستر</h1>
-    <p class="privacy">بيانات موقعك تُستخدم فقط لتوصيل هدية العيد بواسطة فريق معتمد، ولا تظهر لأي شخص خارج فريق التوزيع.</p>
+    <p class="privacy">بيانات موقعك تُستخدم فقط لتوصيل هدية العيد بواسطة أدمن المنطقة المسؤول، ولا تظهر لأي شخص خارج الإدارة.</p>
     <form method="post" action="{{ route('public.request.store') }}" id="gift-form">
         @csrf
         <div class="grid grid-2">

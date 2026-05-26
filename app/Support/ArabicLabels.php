@@ -23,18 +23,18 @@ class ArabicLabels
     {
         return [
             'pending' => 'انتظار',
-            'approved' => 'تم المعالجة',
-            'assigned' => 'تم المعالجة',
+            'approved' => 'انتظار',
+            'assigned' => 'انتظار',
             'gift_received_by_agent' => 'تم المعالجة',
             'on_the_way' => 'تم المعالجة',
-            'delivered' => 'تم تسليم الأمانة',
+            'delivered' => 'تم التسليم',
             'failed' => 'انتظار',
             'cancelled' => 'انتظار',
             'confirmed' => 'انتظار',
             'received' => 'تم الاستلام',
             'allocated' => 'تم الاستلام',
             'in_distribution' => 'تم الاستلام',
-            'completed' => 'تم تسليم الهدية',
+            'completed' => 'تم التسليم',
         ];
     }
 
@@ -42,15 +42,15 @@ class ArabicLabels
     {
         return [
             'pending' => 'انتظار',
-            'approved' => 'تم المعالجة',
-            'delivered' => 'تم تسليم الأمانة',
+            'approved' => 'انتظار',
+            'delivered' => 'تم التسليم',
         ];
     }
 
     public static function donationStatusOptions(): array
     {
         return [
-            'pending' => 'جاري المعالجة',
+            'pending' => 'انتظار',
             'received' => 'تم الاستلام',
             'completed' => 'تم التسليم',
         ];
@@ -70,8 +70,6 @@ class ArabicLabels
     {
         return [
             'own_area' => 'منطقته',
-            'selected_area' => 'منطقة مختارة',
-            'most_needed' => 'الأكثر احتياجًا للتغطية',
         ];
     }
 
