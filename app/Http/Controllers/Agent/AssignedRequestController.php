@@ -30,7 +30,7 @@ class AssignedRequestController extends Controller
     {
         $this->authorize('update', $beneficiaryRequest);
 
-        $allowed = ['gift_received_by_agent', 'on_the_way', 'delivered', 'failed'];
+        $allowed = ['approved', 'delivered'];
         abort_unless(in_array($request->validated('status'), $allowed, true), 422);
 
         $service->setStatus($beneficiaryRequest, $request->validated('status'), $request->validated('note'));

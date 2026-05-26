@@ -25,7 +25,7 @@ class StoreDonationRequest extends FormRequest
         return [
             'donor_name' => ['nullable', 'string', 'max:255'],
             'donor_phone' => ['required', 'string', 'max:20'],
-            'donor_area_id' => ['nullable', 'exists:areas,id'],
+            'donor_area_id' => ['nullable', 'required_if:donation_scope,own_area', 'exists:areas,id'],
             'target_area_id' => ['nullable', 'required_if:donation_scope,selected_area', 'exists:areas,id'],
             'donation_scope' => ['required', 'in:own_area,selected_area,most_needed'],
             'donation_type' => ['required', 'in:meat_kg,money,sacrifice_share,full_sacrifice'],

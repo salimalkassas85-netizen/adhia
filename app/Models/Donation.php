@@ -24,8 +24,7 @@ class Donation extends Model
         'longitude',
         'location_accuracy',
         'status',
-        'pickup_agent_id',
-        'pickup_assigned_at',
+        'assigned_admin_id',
         'notes',
     ];
 
@@ -36,7 +35,6 @@ class Donation extends Model
             'meat_kg' => 'decimal:2',
             'latitude' => 'decimal:7',
             'longitude' => 'decimal:7',
-            'pickup_assigned_at' => 'datetime',
         ];
     }
 
@@ -55,9 +53,9 @@ class Donation extends Model
         return $this->hasMany(Allocation::class);
     }
 
-    public function pickupAgent(): BelongsTo
+    public function assignedAdmin(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'pickup_agent_id');
+        return $this->belongsTo(User::class, 'assigned_admin_id');
     }
 
     public function statusLogs(): MorphMany

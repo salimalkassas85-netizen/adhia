@@ -11,6 +11,7 @@ class BeneficiaryRequestService
     public function __construct(
         private readonly CodeGenerator $codes,
         private readonly StatusLogService $logs,
+        private readonly AdminAssignmentService $adminAssignments,
     ) {}
 
     public function create(array $data): BeneficiaryRequest
@@ -19,7 +20,10 @@ class BeneficiaryRequestService
         $data['has_children'] = (bool) ($data['has_children'] ?? false);
         $data['has_elderly'] = (bool) ($data['has_elderly'] ?? false);
 
-        return BeneficiaryRequest::create($data);
+        $request = BeneficiaryRequest::create($data);
+        $this->adminAssignments->assignRequest($request);
+
+        return $request;
     }
 
     public function approve(BeneficiaryRequest $request, ?string $note = null): BeneficiaryRequest
@@ -33,12 +37,12 @@ class BeneficiaryRequestService
 
         $request->forceFill([
             'assigned_agent_id' => $agent->id,
-            'status' => 'assigned',
+            'status' => 'approved',
             'assigned_at' => now(),
             'admin_notes' => $note ?: $request->admin_notes,
         ])->save();
 
-        $this->logs->log($request, $from, 'assigned', $note);
+        $this->logs->log($request, $from, 'approved', $note);
 
         return $request;
     }

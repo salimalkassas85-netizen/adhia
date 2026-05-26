@@ -10,7 +10,7 @@
 <div class="panel">
     <div class="actions">
         <a class="btn {{ $selectedStatus ? 'secondary' : '' }}" href="{{ route('admin.beneficiary-requests.index') }}">الكل</a>
-        @foreach(['pending' => 'بانتظار المراجعة', 'approved' => 'معتمدة', 'assigned' => 'مسندة', 'on_the_way' => 'في الطريق', 'delivered' => 'تم التسليم', 'failed' => 'تعذر التسليم'] as $status => $label)
+        @foreach(\App\Support\ArabicLabels::beneficiaryStatusOptions() as $status => $label)
             <a class="btn {{ $selectedStatus === $status ? '' : 'secondary' }}" href="{{ route('admin.beneficiary-requests.index', ['status' => $status]) }}">{{ $label }}</a>
         @endforeach
     </div>

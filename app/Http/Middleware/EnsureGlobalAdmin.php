@@ -15,7 +15,7 @@ class EnsureGlobalAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        abort_unless($request->user()?->isAdmin() && $request->user()->area_id === null, 403);
+        abort_unless($request->user()?->isSuperAdmin(), 403);
 
         return $next($request);
     }

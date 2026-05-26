@@ -8,7 +8,7 @@
 <div class="panel">
     <div class="actions">
         <a class="btn {{ $selectedStatus ? 'secondary' : '' }}" href="{{ route('admin.donations.index') }}">الكل</a>
-        @foreach(['pending' => 'جديدة', 'confirmed' => 'مؤكدة', 'received' => 'تم الاستلام', 'allocated' => 'مخصصة', 'in_distribution' => 'قيد التوزيع', 'completed' => 'مكتملة'] as $status => $label)
+        @foreach(\App\Support\ArabicLabels::donationStatusOptions() as $status => $label)
             <a class="btn {{ $selectedStatus === $status ? '' : 'secondary' }}" href="{{ route('admin.donations.index', ['status' => $status]) }}">{{ $label }}</a>
         @endforeach
     </div>

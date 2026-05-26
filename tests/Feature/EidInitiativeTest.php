@@ -112,7 +112,7 @@ class EidInitiativeTest extends TestCase
     public function test_agent_sees_only_assigned_requests(): void
     {
         $agent = $this->user('agent', true);
-        $assigned = $this->beneficiaryRequest(['assigned_agent_id' => $agent->id, 'status' => 'assigned']);
+        $assigned = $this->beneficiaryRequest(['assigned_agent_id' => $agent->id, 'status' => 'approved']);
         $other = $this->beneficiaryRequest(['code' => 'GIFT-OTHER']);
 
         $this->actingAs($agent)->get(route('agent.requests.index'))
@@ -155,7 +155,7 @@ class EidInitiativeTest extends TestCase
     public function test_delivered_status_sets_delivered_at(): void
     {
         $agent = $this->user('agent', true);
-        $request = $this->beneficiaryRequest(['assigned_agent_id' => $agent->id, 'status' => 'assigned']);
+        $request = $this->beneficiaryRequest(['assigned_agent_id' => $agent->id, 'status' => 'approved']);
 
         $this->actingAs($agent)->post(route('agent.requests.status', $request), [
             'status' => 'delivered',
@@ -163,48 +163,6 @@ class EidInitiativeTest extends TestCase
         ])->assertRedirect();
 
         $this->assertNotNull($request->fresh()->delivered_at);
-    }
-
-    public function test_agent_can_see_assigned_donor_pickup_location(): void
-    {
-        $admin = $this->user('admin', true);
-        $agent = $this->user('agent', true);
-        $donation = Donation::create([
-            'code' => 'DON-PICKUP',
-            'donor_name' => 'فاعل خير',
-            'donor_phone' => '055',
-            'donation_scope' => 'most_needed',
-            'donation_type' => 'meat_kg',
-            'meat_kg' => 20,
-            'pickup_address' => 'موقع الاستلام',
-            'latitude' => 21.5,
-            'longitude' => 39.9,
-        ]);
-
-        $this->actingAs($admin)->post(route('admin.donations.assign-pickup', $donation), [
-            'pickup_agent_id' => $agent->id,
-        ])->assertRedirect();
-
-        $this->actingAs($agent)->get(route('agent.pickups.show', $donation))
-            ->assertOk()
-            ->assertSee('موقع الاستلام')
-            ->assertSee('OpenStreetMap');
-    }
-
-    public function test_agent_cannot_see_unassigned_donor_pickup(): void
-    {
-        $agent = $this->user('agent', true);
-        $donation = Donation::create([
-            'code' => 'DON-PRIVATE',
-            'donor_phone' => '055',
-            'donation_scope' => 'most_needed',
-            'donation_type' => 'money',
-            'amount' => 100,
-            'latitude' => 21.5,
-            'longitude' => 39.9,
-        ]);
-
-        $this->actingAs($agent)->get(route('agent.pickups.show', $donation))->assertForbidden();
     }
 
     public function test_area_admin_sees_only_area_requests_and_donations(): void
@@ -263,6 +221,52 @@ class EidInitiativeTest extends TestCase
 
         $this->actingAs($admin)->get(route('admin.beneficiary-requests.show', $otherRequest))->assertForbidden();
         $this->actingAs($admin)->get(route('admin.donations.show', $otherDonation))->assertForbidden();
+    }
+
+    public function test_new_request_is_assigned_to_area_admin_with_notification(): void
+    {
+        $area = Area::create(['name' => 'منطقة الإسناد']);
+        $admin = $this->user('admin', true);
+        $admin->update(['area_id' => $area->id]);
+
+        $this->post('/request-gift', [
+            'first_name' => 'أحمد',
+            'phone' => '0500000000',
+            'area_id' => $area->id,
+            'full_address' => 'عنوان خاص',
+            'latitude' => '21.4225000',
+            'longitude' => '39.8262000',
+        ])->assertRedirect();
+
+        $request = BeneficiaryRequest::first();
+        $this->assertSame($admin->id, $request->assigned_admin_id);
+        $this->assertDatabaseHas('admin_notifications', [
+            'user_id' => $admin->id,
+            'title' => 'طلب هدية جديد',
+        ]);
+    }
+
+    public function test_new_donation_is_assigned_to_area_admin_with_notification(): void
+    {
+        $area = Area::create(['name' => 'منطقة المساهمة']);
+        $admin = $this->user('admin', true);
+        $admin->update(['area_id' => $area->id]);
+
+        $this->post('/donate', [
+            'donor_phone' => '0550000000',
+            'donor_area_id' => $area->id,
+            'donation_scope' => 'own_area',
+            'donation_type' => 'money',
+            'amount' => 100,
+        ])->assertRedirect();
+
+        $donation = Donation::first();
+        $this->assertSame($area->id, $donation->target_area_id);
+        $this->assertSame($admin->id, $donation->assigned_admin_id);
+        $this->assertDatabaseHas('admin_notifications', [
+            'user_id' => $admin->id,
+            'title' => 'مساهمة جديدة',
+        ]);
     }
 
     private function user(string $role, bool $pledged): User

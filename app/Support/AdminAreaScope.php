@@ -20,7 +20,7 @@ class AdminAreaScope
     {
         $user ??= auth()->user();
 
-        return $user?->isAdmin() && $user->area_id === null;
+        return $user?->isSuperAdmin() ?? false;
     }
 
     public function requests(?User $user = null): Builder

@@ -23,7 +23,7 @@ class UpdateDonationStatusRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'status' => ['required', 'in:pending,confirmed,received,allocated,in_distribution,completed,cancelled'],
+            'status' => ['required', 'in:pending,received,completed'],
             'note' => ['nullable', 'string', 'max:2000'],
         ];
     }

@@ -63,13 +63,36 @@ class User extends Authenticatable
         return $this->hasMany(BeneficiaryRequest::class, 'assigned_agent_id');
     }
 
+    public function adminNotifications(): HasMany
+    {
+        return $this->hasMany(AdminNotification::class);
+    }
+
     public function isAdmin(): bool
     {
         return $this->role === 'admin';
     }
 
+    public function isSuperAdmin(): bool
+    {
+        return $this->isAdmin() && $this->area_id === null;
+    }
+
     public function isAgent(): bool
     {
         return $this->role === 'agent';
+    }
+
+    public function roleLabel(): string
+    {
+        if ($this->isSuperAdmin()) {
+            return 'سوبر أدمن';
+        }
+
+        if ($this->isAdmin()) {
+            return 'أدمن منطقة';
+        }
+
+        return 'عضو توزيع';
     }
 }

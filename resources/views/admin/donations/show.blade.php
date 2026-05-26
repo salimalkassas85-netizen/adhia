@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @php
-    $donationStatuses = ['pending','confirmed','received','allocated','in_distribution','completed','cancelled'];
+    $donationStatuses = \App\Support\ArabicLabels::donationStatusOptions();
 @endphp
 @section('content')
 <div class="grid grid-2">
@@ -10,6 +10,7 @@
         <p><strong>الهاتف:</strong> <a href="tel:{{ $donation->donor_phone }}">{{ $donation->donor_phone }}</a></p>
         <p><strong>منطقة المساهم:</strong> {{ $donation->donorArea?->name ?? 'غير محددة' }}</p>
         <p><strong>منطقة التوزيع:</strong> {{ $donation->targetArea?->name ?? 'تحددها الإدارة' }}</p>
+        <p><strong>أدمن المنطقة المسؤول:</strong> {{ $donation->assignedAdmin?->name ?? 'لم يتم الإسناد بعد' }}</p>
         <p><strong>نوع المساهمة:</strong> <x-donation-type :type="$donation->donation_type" /></p>
         <p><strong>المبلغ:</strong> {{ $donation->amount ?? '-' }} | <strong>اللحم:</strong> {{ $donation->meat_kg ?? '-' }} كجم</p>
         <p><strong>الحالة:</strong> <x-status-badge :status="$donation->status" /></p>
@@ -20,27 +21,23 @@
         @endif
     </div>
     <div class="panel">
-        <h2>إجراءات المساهمة</h2>
-        <form method="post" action="{{ route('admin.donations.confirm',$donation) }}">@csrf<button>تأكيد</button></form>
-        <form method="post" action="{{ route('admin.donations.receive',$donation) }}" style="margin-top:10px">@csrf<button>تسجيل الاستلام</button></form>
-        <hr>
-        <form method="post" action="{{ route('admin.donations.assign-pickup',$donation) }}">@csrf
-            <div class="field"><label>إسناد استلام المساهمة إلى</label><select name="pickup_agent_id">@foreach($agents as $agent)<option value="{{ $agent->id }}" @selected($donation->pickup_agent_id === $agent->id)>{{ $agent->name }}</option>@endforeach</select></div>
-            <button>إسناد الاستلام</button>
-        </form>
+        <h2>إدارة المساهمة</h2>
+        <p class="notice">هذه المساهمة مسندة تلقائيًا لأدمن المنطقة. من هنا يتم تحديث الحالة فقط أو ربطها بطلب هدية عند التوزيع.</p>
+
+        <form method="post" action="{{ route('admin.donations.receive',$donation) }}">@csrf<button>تم الاستلام</button></form>
         <hr>
         <form method="post" action="{{ route('admin.donations.allocate',$donation) }}">@csrf
             <div class="field"><label>المنطقة</label><select name="area_id">@foreach($areas as $area)<option value="{{ $area->id }}">{{ $area->name }}</option>@endforeach</select></div>
             <div class="field"><label>طلب هدية العيد</label><select name="beneficiary_request_id">@foreach($requests as $request)<option value="{{ $request->id }}">{{ $request->code }} - {{ $request->area?->name }}</option>@endforeach</select></div>
-            <button>تخصيص / نقل تغطية</button>
+            <button>ربط المساهمة بطلب هدية</button>
         </form>
         <hr>
         <form method="post" action="{{ route('admin.donations.status',$donation) }}">@csrf
             <div class="field">
                 <label>الحالة</label>
                 <select name="status">
-                    @foreach($donationStatuses as $status)
-                        <option value="{{ $status }}" @selected($donation->status === $status)>{{ \App\Support\ArabicLabels::status($status) }}</option>
+                    @foreach($donationStatuses as $status => $label)
+                        <option value="{{ $status }}" @selected($donation->status === $status)>{{ $label }}</option>
                     @endforeach
                 </select>
             </div>

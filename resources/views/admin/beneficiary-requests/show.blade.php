@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @php
-    $requestStatuses = ['pending','approved','assigned','gift_received_by_agent','on_the_way','delivered','failed','cancelled'];
+    $requestStatuses = \App\Support\ArabicLabels::beneficiaryStatusOptions();
 @endphp
 @section('content')
 <div class="grid grid-2">
@@ -31,8 +31,8 @@
             <div class="field">
                 <label>تحديث الحالة</label>
                 <select name="status">
-                    @foreach($requestStatuses as $status)
-                        <option value="{{ $status }}" @selected($request->status === $status)>{{ \App\Support\ArabicLabels::status($status) }}</option>
+                    @foreach($requestStatuses as $status => $label)
+                        <option value="{{ $status }}" @selected($request->status === $status)>{{ $label }}</option>
                     @endforeach
                 </select>
             </div>

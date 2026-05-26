@@ -14,7 +14,7 @@ class HomeController extends Controller
         return view('public.home', [
             'areasCount' => Area::where('active', true)->count(),
             'deliveredCount' => BeneficiaryRequest::where('status', 'delivered')->count(),
-            'donationsCount' => Donation::whereIn('status', ['confirmed', 'received', 'allocated', 'in_distribution', 'completed'])->count(),
+            'donationsCount' => Donation::whereIn('status', ['received', 'completed'])->count(),
         ]);
     }
 }

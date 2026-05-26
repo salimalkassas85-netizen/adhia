@@ -22,6 +22,7 @@ class BeneficiaryRequest extends Model
         'longitude',
         'location_accuracy',
         'status',
+        'assigned_admin_id',
         'assigned_agent_id',
         'approved_at',
         'assigned_at',
@@ -51,6 +52,11 @@ class BeneficiaryRequest extends Model
     public function assignedAgent(): BelongsTo
     {
         return $this->belongsTo(User::class, 'assigned_agent_id');
+    }
+
+    public function assignedAdmin(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'assigned_admin_id');
     }
 
     public function statusLogs(): MorphMany

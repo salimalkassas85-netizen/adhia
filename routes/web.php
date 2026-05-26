@@ -6,7 +6,6 @@ use App\Http\Controllers\Admin\AreaController;
 use App\Http\Controllers\Admin\BeneficiaryRequestController as AdminBeneficiaryRequestController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\DonationController as AdminDonationController;
-use App\Http\Controllers\Agent\AssignedPickupController;
 use App\Http\Controllers\Agent\AssignedRequestController;
 use App\Http\Controllers\Agent\DashboardController as AgentDashboardController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
@@ -55,7 +54,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin', 'pledg
     Route::post('/donations/{donation}/confirm', [AdminDonationController::class, 'confirm'])->name('donations.confirm');
     Route::post('/donations/{donation}/receive', [AdminDonationController::class, 'receive'])->name('donations.receive');
     Route::post('/donations/{donation}/allocate', [AdminDonationController::class, 'allocate'])->name('donations.allocate');
-    Route::post('/donations/{donation}/assign-pickup', [AdminDonationController::class, 'assignPickup'])->name('donations.assign-pickup');
     Route::post('/donations/{donation}/status', [AdminDonationController::class, 'status'])->name('donations.status');
 });
 
@@ -64,6 +62,4 @@ Route::prefix('agent')->name('agent.')->middleware(['auth', 'role:agent', 'pledg
     Route::get('/requests', [AssignedRequestController::class, 'index'])->name('requests.index');
     Route::get('/requests/{beneficiaryRequest}', [AssignedRequestController::class, 'show'])->name('requests.show');
     Route::post('/requests/{beneficiaryRequest}/status', [AssignedRequestController::class, 'status'])->name('requests.status');
-    Route::get('/pickups', [AssignedPickupController::class, 'index'])->name('pickups.index');
-    Route::get('/pickups/{donation}', [AssignedPickupController::class, 'show'])->name('pickups.show');
 });

@@ -12,7 +12,7 @@ class StoreAdminUserRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()?->isAdmin() && $this->user()->area_id === null;
+        return $this->user()?->isSuperAdmin() ?? false;
     }
 
     /**

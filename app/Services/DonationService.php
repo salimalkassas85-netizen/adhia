@@ -10,13 +10,21 @@ class DonationService
     public function __construct(
         private readonly CodeGenerator $codes,
         private readonly StatusLogService $logs,
+        private readonly AdminAssignmentService $adminAssignments,
     ) {}
 
     public function create(array $data): Donation
     {
         $data['code'] = $this->codes->unique('DON', Donation::class);
 
-        return Donation::create($data);
+        if (($data['donation_scope'] ?? null) === 'own_area') {
+            $data['target_area_id'] = $data['donor_area_id'] ?? null;
+        }
+
+        $donation = Donation::create($data);
+        $this->adminAssignments->assignDonation($donation);
+
+        return $donation;
     }
 
     public function setStatus(Donation $donation, string $status, ?string $note = null): Donation
@@ -37,7 +45,7 @@ class DonationService
             'status' => 'assigned',
         ]);
 
-        $this->setStatus($donation, 'allocated', 'تم تخصيص التبرع لمنطقة توزيع.');
+        $this->setStatus($donation, 'received', 'تم تخصيص المساهمة لمنطقة توزيع.');
 
         return $allocation;
     }

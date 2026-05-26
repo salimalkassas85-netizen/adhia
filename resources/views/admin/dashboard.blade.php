@@ -17,12 +17,30 @@
 <div class="stats">
     <a class="card stat" href="{{ route('admin.beneficiary-requests.index') }}"><span>إجمالي الطلبات</span><strong>{{ $totalRequests }}</strong></a>
     <a class="card stat" href="{{ route('admin.beneficiary-requests.index', ['status' => 'pending']) }}"><span>بانتظار المراجعة</span><strong>{{ $pendingRequests }}</strong></a>
-    <a class="card stat" href="{{ route('admin.beneficiary-requests.index', ['status' => 'assigned']) }}"><span>مسندة للتوزيع</span><strong>{{ $assignedRequests }}</strong></a>
+    <a class="card stat" href="{{ route('admin.beneficiary-requests.index', ['status' => 'approved']) }}"><span>تم المعالجة</span><strong>{{ $assignedRequests }}</strong></a>
     <a class="card stat" href="{{ route('admin.beneficiary-requests.index', ['status' => 'delivered']) }}"><span>تم التسليم</span><strong>{{ $deliveredRequests }}</strong></a>
     <a class="card stat" href="{{ route('admin.donations.index') }}"><span>إجمالي المساهمات</span><strong>{{ $totalDonations }}</strong></a>
     <a class="card stat" href="{{ route('admin.donations.index', ['status' => 'pending']) }}"><span>مساهمات جديدة</span><strong>{{ $pendingDonations }}</strong></a>
-    <a class="card stat" href="{{ route('admin.donations.index', ['status' => 'confirmed']) }}"><span>جاهزة للتوزيع</span><strong>{{ $confirmedDonations }}</strong></a>
-    <a class="card stat" href="{{ route('admin.beneficiary-requests.index', ['status' => 'failed']) }}"><span>تعذر التسليم</span><strong>{{ $failedRequests }}</strong></a>
+    <a class="card stat" href="{{ route('admin.donations.index', ['status' => 'received']) }}"><span>تم الاستلام/التسليم</span><strong>{{ $confirmedDonations }}</strong></a>
+</div>
+
+<div class="panel" style="margin-top:18px">
+    <div class="actions" style="justify-content:space-between">
+        <h2>الإشعارات</h2>
+        <span class="privacy">آخر ما تم إسناده لك تلقائيًا</span>
+    </div>
+    @forelse($notifications as $notification)
+        <p>
+            <strong>{{ $notification->title }}</strong>
+            <span class="privacy">{{ $notification->created_at->format('Y-m-d H:i') }}</span><br>
+            {{ $notification->body }}
+            @if($notification->url)
+                <a href="{{ $notification->url }}">فتح</a>
+            @endif
+        </p>
+    @empty
+        <p class="privacy">لا توجد إشعارات بعد.</p>
+    @endforelse
 </div>
 
 <div class="grid grid-2" style="margin-top:18px">

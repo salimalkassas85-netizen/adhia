@@ -26,7 +26,8 @@ return new class extends Migration
             $table->decimal('latitude', 10, 7)->nullable();
             $table->decimal('longitude', 10, 7)->nullable();
             $table->unsignedInteger('location_accuracy')->nullable();
-            $table->enum('status', ['pending', 'confirmed', 'received', 'allocated', 'in_distribution', 'completed', 'cancelled'])->default('pending');
+            $table->enum('status', ['pending', 'received', 'completed'])->default('pending');
+            $table->foreignId('assigned_admin_id')->nullable()->constrained('users')->nullOnDelete();
             $table->text('notes')->nullable();
             $table->timestamps();
         });

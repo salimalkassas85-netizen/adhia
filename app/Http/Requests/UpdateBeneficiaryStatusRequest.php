@@ -23,7 +23,7 @@ class UpdateBeneficiaryStatusRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'status' => ['required', 'in:pending,approved,assigned,gift_received_by_agent,on_the_way,delivered,failed,cancelled'],
+            'status' => ['required', 'in:pending,approved,delivered'],
             'note' => ['nullable', 'string', 'max:2000'],
         ];
     }

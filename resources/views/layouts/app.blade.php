@@ -257,14 +257,13 @@
                         <a href="{{ route('admin.beneficiary-requests.index') }}">طلبات الهدية</a>
                         <a href="{{ route('admin.donations.index') }}">المساهمات</a>
                         <a href="{{ route('admin.agents.index') }}">فريق التوزيع</a>
-                        @if(auth()->user()->area_id === null)
+                        @if(auth()->user()->isSuperAdmin())
                             <a href="{{ route('admin.admin-users.index') }}">أدمنز المناطق</a>
                             <a href="{{ route('admin.areas.index') }}">المناطق</a>
                         @endif
                     @else
                         <a href="{{ route('agent.dashboard') }}">لوحة التوزيع</a>
                         <a href="{{ route('agent.requests.index') }}">طلبات مسندة</a>
-                        <a href="{{ route('agent.pickups.index') }}">استلامات</a>
                     @endif
                     <form method="post" action="{{ route('logout') }}">@csrf<button class="btn secondary" type="submit">خروج</button></form>
                 @else
@@ -291,7 +290,19 @@
         @yield('content')
     </main>
 
-    <footer class="footer">الأمانة والستر وحفظ الخصوصية أساس هذه المبادرة.</footer>
+    <footer class="footer">
+        <div>الأمانة والستر وحفظ الخصوصية أساس هذه المبادرة.</div>
+        @auth
+            <div class="privacy">
+                مسجل الدخول: <strong>{{ auth()->user()->name }}</strong>
+                -
+                <strong>{{ auth()->user()->roleLabel() }}</strong>
+                @if(auth()->user()->area)
+                    - {{ auth()->user()->area->name }}
+                @endif
+            </div>
+        @endauth
+    </footer>
 </div>
 @stack('scripts')
 </body>

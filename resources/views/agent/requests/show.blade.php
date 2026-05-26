@@ -20,7 +20,7 @@
         <h2>تحديث التوصيل</h2>
         <form method="post" action="{{ route('agent.requests.status',$request) }}">
             @csrf
-            <div class="field"><label>الحالة</label><select name="status"><option value="gift_received_by_agent">استلمت الهدية</option><option value="on_the_way">في الطريق</option><option value="delivered">تم التسليم</option><option value="failed">تعذر التسليم</option></select></div>
+            <div class="field"><label>الحالة</label><select name="status"><option value="approved">تم المعالجة</option><option value="delivered">تم تسليم الأمانة</option></select></div>
             <div class="field"><label>ملاحظة التوصيل</label><textarea name="note">{{ old('note', $request->agent_notes) }}</textarea></div>
             <button>حفظ التحديث</button>
         </form>

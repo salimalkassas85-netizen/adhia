@@ -22,19 +22,37 @@ class ArabicLabels
     public static function statuses(): array
     {
         return [
-            'pending' => 'بانتظار المراجعة',
-            'approved' => 'معتمد',
-            'assigned' => 'مسند لفريق التوزيع',
-            'gift_received_by_agent' => 'استلمها فريق التوزيع',
-            'on_the_way' => 'في الطريق',
-            'delivered' => 'تم التسليم',
-            'failed' => 'تعذر التسليم',
-            'cancelled' => 'ملغي',
-            'confirmed' => 'مؤكد',
+            'pending' => 'انتظار',
+            'approved' => 'تم المعالجة',
+            'assigned' => 'تم المعالجة',
+            'gift_received_by_agent' => 'تم المعالجة',
+            'on_the_way' => 'تم المعالجة',
+            'delivered' => 'تم تسليم الأمانة',
+            'failed' => 'انتظار',
+            'cancelled' => 'انتظار',
+            'confirmed' => 'انتظار',
             'received' => 'تم الاستلام',
-            'allocated' => 'مخصص',
-            'in_distribution' => 'قيد التوزيع',
-            'completed' => 'مكتمل',
+            'allocated' => 'تم الاستلام',
+            'in_distribution' => 'تم الاستلام',
+            'completed' => 'تم تسليم الهدية',
+        ];
+    }
+
+    public static function beneficiaryStatusOptions(): array
+    {
+        return [
+            'pending' => 'انتظار',
+            'approved' => 'تم المعالجة',
+            'delivered' => 'تم تسليم الأمانة',
+        ];
+    }
+
+    public static function donationStatusOptions(): array
+    {
+        return [
+            'pending' => 'انتظار',
+            'received' => 'تم الاستلام',
+            'completed' => 'تم تسليم الهدية',
         ];
     }
 
