@@ -12,7 +12,7 @@ class BeneficiaryRequestPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->isAdmin();
     }
 
     /**
@@ -20,7 +20,15 @@ class BeneficiaryRequestPolicy
      */
     public function view(User $user, BeneficiaryRequest $beneficiaryRequest): bool
     {
-        return $user->isAdmin() || (int) $beneficiaryRequest->assigned_agent_id === (int) $user->id;
+        if ($user->isSuperAdmin()) {
+            return true;
+        }
+
+        if ($user->isAdmin() && $user->area_id) {
+            return (int) $beneficiaryRequest->area_id === (int) $user->area_id;
+        }
+
+        return (int) $beneficiaryRequest->assigned_agent_id === (int) $user->id;
     }
 
     /**
@@ -36,7 +44,15 @@ class BeneficiaryRequestPolicy
      */
     public function update(User $user, BeneficiaryRequest $beneficiaryRequest): bool
     {
-        return $user->isAdmin() || (int) $beneficiaryRequest->assigned_agent_id === (int) $user->id;
+        if ($user->isSuperAdmin()) {
+            return true;
+        }
+
+        if ($user->isAdmin() && $user->area_id) {
+            return (int) $beneficiaryRequest->area_id === (int) $user->area_id;
+        }
+
+        return (int) $beneficiaryRequest->assigned_agent_id === (int) $user->id;
     }
 
     /**

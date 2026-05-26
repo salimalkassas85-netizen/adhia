@@ -10,7 +10,6 @@
         <p><strong>الهاتف:</strong> <a href="tel:{{ $donation->donor_phone }}">{{ $donation->donor_phone }}</a></p>
         <p><strong>منطقة المساهم:</strong> {{ $donation->donorArea?->name ?? 'غير محددة' }}</p>
         <p><strong>منطقة التوزيع:</strong> {{ $donation->targetArea?->name ?? 'تحددها الإدارة' }}</p>
-        <p><strong>أدمن المنطقة المسؤول:</strong> {{ $donation->assignedAdmin?->name ?? 'لم يتم الإسناد بعد' }}</p>
         <p><strong>نوع المساهمة:</strong> <x-donation-type :type="$donation->donation_type" /></p>
         <p><strong>المبلغ:</strong> {{ $donation->amount ?? '-' }} | <strong>اللحم:</strong> {{ $donation->meat_kg ?? '-' }} كجم</p>
         <p><strong>الحالة:</strong> <x-status-badge :status="$donation->status" /></p>

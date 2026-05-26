@@ -16,6 +16,7 @@
     </div>
 </div>
 
+<div class="table-responsive">
 <table class="table">
     <thead><tr><th>الرمز</th><th>الاسم الأول</th><th>الهاتف</th><th>المنطقة</th><th>الحالة</th><th>فريق التوزيع</th><th>الموقع</th><th></th></tr></thead>
     <tbody>
@@ -35,5 +36,6 @@
     @endforelse
     </tbody>
 </table>
+</div>
 {{ $requests->links() }}
 @endsection

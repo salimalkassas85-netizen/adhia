@@ -14,6 +14,7 @@
     </div>
 </div>
 
+<div class="table-responsive">
 <table class="table">
     <thead><tr><th>الرمز</th><th>المتبرع</th><th>الهاتف</th><th>منطقة المتبرع</th><th>منطقة التوزيع</th><th>النوع</th><th>الحالة</th><th>موقع الاستلام</th><th></th></tr></thead>
     <tbody>
@@ -34,5 +35,6 @@
     @endforelse
     </tbody>
 </table>
+</div>
 {{ $donations->links() }}
 @endsection

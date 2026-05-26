@@ -2,11 +2,13 @@
 
 namespace App\Services;
 
-use App\Models\AdminNotification;
 use App\Models\Area;
 use App\Models\BeneficiaryRequest;
 use App\Models\Donation;
 use App\Models\User;
+use App\Notifications\NewBeneficiaryRequestAssigned;
+use App\Notifications\NewDonationAssigned;
+use App\Notifications\SuperAdminAlert;
 
 class AdminAssignmentService
 {
@@ -15,11 +17,23 @@ class AdminAssignmentService
         $admin = $this->areaAdmin($request->area_id);
 
         if (! $admin) {
+            $this->notifySuperAdmins(
+                'طلب هدية بدون أدمن منطقة',
+                "لا يوجد أدمن لمنطقة الطلب ({$request->code}). يرجى تعيين أدمن للمنطقة.",
+                route('admin.beneficiary-requests.show', $request),
+            );
+
             return null;
         }
 
         $request->forceFill(['assigned_admin_id' => $admin->id])->save();
-        $this->notify($admin, 'طلب هدية جديد', 'تم إسناد طلب هدية جديد لمنطقتك.', route('admin.beneficiary-requests.show', $request));
+        $admin->notify(new NewBeneficiaryRequestAssigned($request));
+
+        $this->notifySuperAdmins(
+            'طلب هدية جديد',
+            "تم استقبال طلب هدية جديد ({$request->code}) وإسناده لأدمن المنطقة.",
+            route('admin.beneficiary-requests.show', $request),
+        );
 
         return $admin;
     }
@@ -29,12 +43,24 @@ class AdminAssignmentService
         $areaId = $this->resolveDonationArea($donation);
 
         if (! $areaId) {
+            $this->notifySuperAdmins(
+                'مساهمة بدون منطقة',
+                "لم يتم تحديد منطقة للمساهمة ({$donation->code}). يرجى التخصيص يدويًا.",
+                route('admin.donations.show', $donation),
+            );
+
             return null;
         }
 
         $admin = $this->areaAdmin($areaId);
 
         if (! $admin) {
+            $this->notifySuperAdmins(
+                'مساهمة بدون أدمن منطقة',
+                "لا يوجد أدمن لمنطقة المساهمة ({$donation->code}). يرجى تعيين أدمن للمنطقة.",
+                route('admin.donations.show', $donation),
+            );
+
             return null;
         }
 
@@ -43,7 +69,13 @@ class AdminAssignmentService
             'assigned_admin_id' => $admin->id,
         ])->save();
 
-        $this->notify($admin, 'مساهمة جديدة', 'تم إسناد مساهمة جديدة لمنطقتك.', route('admin.donations.show', $donation));
+        $admin->notify(new NewDonationAssigned($donation));
+
+        $this->notifySuperAdmins(
+            'مساهمة جديدة',
+            "تم استقبال مساهمة جديدة ({$donation->code}) وإسنادها لأدمن المنطقة.",
+            route('admin.donations.show', $donation),
+        );
 
         return $admin;
     }
@@ -74,13 +106,12 @@ class AdminAssignmentService
             ->value('id');
     }
 
-    private function notify(User $admin, string $title, string $body, string $url): AdminNotification
+    private function notifySuperAdmins(string $title, string $body, ?string $url = null): void
     {
-        return AdminNotification::create([
-            'user_id' => $admin->id,
-            'title' => $title,
-            'body' => $body,
-            'url' => $url,
-        ]);
+        $superAdmins = User::where('role', 'admin')->whereNull('area_id')->get();
+
+        foreach ($superAdmins as $superAdmin) {
+            $superAdmin->notify(new SuperAdminAlert($title, $body, $url));
+        }
     }
 }

@@ -80,4 +80,17 @@ class DonationController extends Controller
 
         return back()->with('status', 'تم تحديث حالة المساهمة.');
     }
+
+    /**
+     * Create delivery bond/receipt - super admin only.
+     * Protected by global.admin middleware in routes.
+     */
+    public function deliveryBond(Request $request, Donation $donation, DonationService $service)
+    {
+        abort_unless(auth()->user()->isSuperAdmin(), 403);
+
+        $service->setStatus($donation, 'completed', 'تم إصدار سند تسليم.');
+
+        return back()->with('status', 'تم إصدار سند التسليم بنجاح.');
+    }
 }

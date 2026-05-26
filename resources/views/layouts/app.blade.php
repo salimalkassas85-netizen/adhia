@@ -29,10 +29,11 @@
             color: var(--ink);
             font-family: Tahoma, Arial, sans-serif;
             line-height: 1.75;
+            overflow-x: hidden;
         }
         a { color: var(--accent); text-decoration: none; }
         label { display: block; font-weight: 700; margin-bottom: 6px; }
-        .site { min-height: 100vh; display: flex; flex-direction: column; }
+        .site { min-height: 100vh; display: flex; flex-direction: column; max-width: 100vw; overflow-x: hidden; }
 
         .topbar {
             position: sticky;
@@ -96,6 +97,48 @@
         }
         .navlinks form { margin: 0; }
 
+        /* Notification bell */
+        .notification-bell {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 38px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            color: var(--ink);
+            font-weight: 700;
+            transition: background .2s ease, color .2s ease, transform .2s ease;
+        }
+        .notification-bell:hover {
+            background: var(--soft);
+            color: var(--accent-dark);
+            transform: translateY(-1px);
+        }
+        .notification-bell svg { width: 22px; height: 22px; }
+        .notification-badge {
+            position: absolute;
+            top: 4px;
+            left: 6px;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 999px;
+            background: var(--danger);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+            line-height: 1;
+            animation: badgePulse 2s ease-in-out infinite;
+        }
+        @keyframes badgePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
         .wrap { max-width: 1120px; margin: auto; width: 100%; padding: 30px 18px; }
         .hero { display: grid; gap: 28px; grid-template-columns: 1.08fr .92fr; align-items: center; padding: 38px 0; }
         .hero h1 { font-size: clamp(30px, 5vw, 54px); line-height: 1.2; margin: 0 0 12px; }
@@ -134,8 +177,24 @@
         .notice { background: var(--soft); border: 1px solid #b8ded8; border-radius: 8px; padding: 12px; color: #23534c; }
         .errors { background: #fff2f0; border: 1px solid #ffd3cc; color: var(--danger); border-radius: 8px; padding: 12px; margin-bottom: 14px; }
         .map { height: 310px; border: 1px solid var(--line); border-radius: 8px; background: #e9eee9; overflow: hidden; }
+
+        /* Table responsive wrapper */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border-radius: 8px;
+            border: 1px solid var(--line);
+        }
+        .table-responsive .table {
+            border: none;
+            border-radius: 0;
+            min-width: 600px;
+        }
+
         .table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
-        .table th, .table td { padding: 10px; border-bottom: 1px solid var(--line); text-align: right; vertical-align: top; }
+        .table th, .table td { padding: 10px; border-bottom: 1px solid var(--line); text-align: right; vertical-align: top; white-space: nowrap; }
+        .table td:last-child { white-space: nowrap; }
         .badge { display: inline-flex; align-items: center; border-radius: 999px; padding: 3px 9px; font-size: 13px; background: #f2eee4; color: #59451f; }
         .badge.ok { background: #e7f7ec; color: var(--ok); }
         .badge.warn { background: #fff7df; color: #8a5a00; }
@@ -261,6 +320,17 @@
                             <a href="{{ route('admin.admin-users.index') }}">أدمنز المناطق</a>
                             <a href="{{ route('admin.areas.index') }}">المناطق</a>
                         @endif
+                        {{-- Notification bell --}}
+                        @php $unreadCount = auth()->user()->unreadNotifications()->count(); @endphp
+                        <a href="{{ route('admin.notifications.index') }}" class="notification-bell" title="الإشعارات" id="notification-bell">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                            </svg>
+                            @if($unreadCount > 0)
+                                <span class="notification-badge">{{ $unreadCount > 99 ? '99+' : $unreadCount }}</span>
+                            @endif
+                        </a>
                     @else
                         <a href="{{ route('agent.dashboard') }}">لوحة التوزيع</a>
                         <a href="{{ route('agent.requests.index') }}">طلبات مسندة</a>

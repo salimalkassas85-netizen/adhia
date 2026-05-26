@@ -20,8 +20,10 @@ class DashboardController extends Controller
             ->orderBy('name')
             ->get();
 
+        $user = auth()->user();
+
         return view('admin.dashboard', [
-            'currentArea' => auth()->user()->area,
+            'currentArea' => $user->area,
             'isGlobalAdmin' => $scope->isGlobal(),
             'totalRequests' => (clone $requests)->count(),
             'pendingRequests' => (clone $requests)->where('status', 'pending')->count(),
@@ -32,7 +34,8 @@ class DashboardController extends Controller
             'totalDonations' => (clone $donations)->count(),
             'pendingDonations' => (clone $donations)->where('status', 'pending')->count(),
             'confirmedDonations' => (clone $donations)->whereIn('status', ['received', 'completed'])->count(),
-            'notifications' => auth()->user()->adminNotifications()->latest()->limit(8)->get(),
+            'notifications' => $user->unreadNotifications()->latest()->limit(8)->get(),
+            'unreadNotificationsCount' => $user->unreadNotifications()->count(),
             'recentRequests' => (clone $requests)->with(['area', 'assignedAgent'])->latest()->limit(8)->get(),
             'recentDonations' => (clone $donations)->with(['donorArea', 'targetArea'])->latest()->limit(8)->get(),
             'donationsByArea' => (clone $donations)->selectRaw('target_area_id, count(*) as total')->groupBy('target_area_id')->with('targetArea')->get(),

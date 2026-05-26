@@ -23,4 +23,14 @@ class Area extends Model
     {
         return $this->hasMany(Donation::class, 'target_area_id');
     }
+
+    public function admins(): HasMany
+    {
+        return $this->hasMany(User::class, 'area_id')->where('role', 'admin');
+    }
+
+    public function agents(): HasMany
+    {
+        return $this->hasMany(User::class, 'area_id')->where('role', 'agent');
+    }
 }
