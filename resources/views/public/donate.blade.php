@@ -3,7 +3,7 @@
 <div class="panel">
     <h1>المساهمة في هدية العيد</h1>
     <p class="privacy">تصل مساهمتك عبر أدمن المنطقة المسؤول دون كشف بيانات المحتاج للمتبرع.</p>
-    <form method="post" action="{{ route('public.donation.store') }}">
+    <form method="post" action="{{ route('public.donation.store') }}" id="donation-form">
         @csrf
         <div class="grid grid-2">
             <div class="field"><label>اسم المساهم (اختياري)</label><input name="donor_name" value="{{ old('donor_name') }}"></div>
@@ -21,7 +21,9 @@
                 <h2>الحالات المحتاجة في هذه المنطقة</h2>
                 <span class="badge" id="cases-count">0 حالة</span>
             </div>
-            <p class="privacy">يمكنك اختيار حالة واحدة فقط. بجانب كل حالة يظهر إجمالي ما خُصص لها من كل المساهمات السابقة والحالية غير الملغية.</p>
+            <p class="privacy">اختيار المحتاج إجباري. لا يمكن تسجيل المساهمة إلا بعد اختيار حالة من منطقتك. بجانب كل حالة يظهر إجمالي ما خُصص لها من كل المساهمات السابقة والحالية غير الملغية.</p>
+            @error('selected_case_id')<p class="errors">{{ $message }}</p>@enderror
+            <p class="errors" id="case-required-message" style="display:none;"></p>
             <div id="cases-list" class="grid grid-2"></div>
         </div>
 
@@ -33,7 +35,7 @@
         <p class="hint" id="pickup-message">اختياري عند وجود استلام من موقعك. لن تكتب الإحداثيات يدويًا.</p>
         <div id="pickup-map" class="map"></div>
         <div class="field"><label>ملاحظات</label><textarea name="notes">{{ old('notes') }}</textarea></div>
-        <div class="actions"><button type="submit">تسجيل المساهمة</button></div>
+        <div class="actions"><button type="submit" id="submit-donation" disabled>تسجيل المساهمة</button></div>
     </form>
 </div>
 @endsection
@@ -98,6 +100,19 @@ const donorAreaSelect = document.querySelector('select[name="donor_area_id"]');
 const casesContainer = document.getElementById('cases-container');
 const casesList = document.getElementById('cases-list');
 const casesCount = document.getElementById('cases-count');
+const donationForm = document.getElementById('donation-form');
+const submitDonation = document.getElementById('submit-donation');
+const caseRequiredMessage = document.getElementById('case-required-message');
+const oldSelectedCaseId = @json(old('selected_case_id'));
+
+function setSubmitState() {
+    const selectedCase = document.querySelector('input[name="selected_case_id"]:checked');
+    submitDonation.disabled = !selectedCase;
+    if (selectedCase) {
+        caseRequiredMessage.style.display = 'none';
+        caseRequiredMessage.textContent = '';
+    }
+}
 
 function fetchCases() {
     let areaId = null;
@@ -106,10 +121,13 @@ function fetchCases() {
     if (!areaId) {
         casesContainer.style.display = 'none';
         casesList.innerHTML = '';
+        submitDonation.disabled = true;
+        caseRequiredMessage.style.display = 'none';
         return;
     }
 
     casesList.innerHTML = '<p class="privacy">جاري البحث عن حالات مستحقة...</p>';
+    submitDonation.disabled = true;
     casesContainer.style.display = 'block';
 
     fetch(`/api/areas/${areaId}/cases`)
@@ -117,13 +135,15 @@ function fetchCases() {
         .then(cases => {
             casesCount.textContent = `${cases.length} حالة`;
             if (cases.length === 0) {
-                casesList.innerHTML = '<p class="privacy">لا توجد حالات مسجلة في هذه المنطقة حالياً. سيتم حفظ مساهمتك كرصيد للمنطقة للحالات القادمة.</p>';
+                casesList.innerHTML = '<p class="errors">لا توجد حالات محتاجة في هذه المنطقة حالياً، لذلك لا يمكن تسجيل مساهمة الآن.</p>';
+                submitDonation.disabled = true;
+                caseRequiredMessage.style.display = 'none';
                 return;
             }
 
             casesList.innerHTML = cases.map(c => `
                 <label class="card" style="display:block; cursor:pointer; background:#fff;">
-                    <input type="radio" name="selected_case_id" value="${c.id}" style="width:auto; margin-left:8px;">
+                    <input type="radio" name="selected_case_id" value="${c.id}" required ${String(c.id) === String(oldSelectedCaseId || '') ? 'checked' : ''} style="width:auto; margin-left:8px;">
                     <strong>مستفيد #${c.id}</strong>
                     <div style="font-size:13px; color:var(--muted); margin-top:4px;">
                         <div>الأسرة: ${c.family_members_count} فرد</div>
@@ -135,13 +155,30 @@ function fetchCases() {
                     </div>
                 </label>
             `).join('');
+            casesList.querySelectorAll('input[name="selected_case_id"]').forEach(input => {
+                input.addEventListener('change', setSubmitState);
+            });
+            setSubmitState();
         })
         .catch(() => {
             casesList.innerHTML = '<p class="errors">حدث خطأ أثناء جلب الحالات.</p>';
+            submitDonation.disabled = true;
         });
 }
 
 donorAreaSelect.addEventListener('change', fetchCases);
+
+donationForm.addEventListener('submit', (event) => {
+    const selectedCase = document.querySelector('input[name="selected_case_id"]:checked');
+    if (!selectedCase) {
+        event.preventDefault();
+        caseRequiredMessage.textContent = donorAreaSelect.value
+            ? 'اختيار المحتاج إجباري قبل تسجيل المساهمة.'
+            : 'اختر منطقتك أولاً ثم اختر المحتاج.';
+        caseRequiredMessage.style.display = 'block';
+        casesContainer.style.display = donorAreaSelect.value ? 'block' : 'none';
+    }
+});
 
 // Initial fetch if values are pre-selected
 fetchCases();

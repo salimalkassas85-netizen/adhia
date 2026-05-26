@@ -36,13 +36,20 @@ class StoreDonationRequest extends FormRequest
                 $validator->errors()->add('donor_area_id', 'لا يمكن تسجيل مساهمة خارج منطقتك.');
             }
 
+            $hasCasesInArea = \App\Models\BeneficiaryRequest::where('area_id', $this->integer('donor_area_id'))->exists();
+
+            if (! $hasCasesInArea) {
+                $validator->errors()->add('selected_case_id', 'لا يمكن تسجيل مساهمة الآن لأنه لا توجد حالات محتاجة في منطقتك.');
+                return;
+            }
+
             if ($this->filled('selected_case_id')) {
                 $caseExists = \App\Models\BeneficiaryRequest::whereKey($this->integer('selected_case_id'))
                     ->where('area_id', $this->integer('donor_area_id'))
                     ->exists();
 
                 if (! $caseExists) {
-                    $validator->errors()->add('selected_case_id', 'الحالة المختارة يجب أن تكون من نفس منطقتك.');
+                    $validator->errors()->add('selected_case_id', 'يجب اختيار حالة محتاجة من نفس منطقتك قبل تسجيل المساهمة.');
                 }
             }
         });
@@ -69,7 +76,7 @@ class StoreDonationRequest extends FormRequest
             'longitude' => ['nullable', 'numeric', 'between:-180,180'],
             'location_accuracy' => ['nullable', 'integer', 'min:0', 'max:100000'],
             'notes' => ['nullable', 'string', 'max:2000'],
-            'selected_case_id' => ['nullable', 'integer', 'exists:beneficiary_requests,id'],
+            'selected_case_id' => ['required', 'integer', 'exists:beneficiary_requests,id'],
             'selected_cases' => ['prohibited'],
             'selected_cases.*' => ['prohibited'],
         ];
