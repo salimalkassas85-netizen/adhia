@@ -13,17 +13,17 @@ class AreaAdminSeeder extends Seeder
     public function run(): void
     {
         User::updateOrCreate(
-            ['email' => 'admin@adhia.local'],
+            ['email' => 'admin@rowad.com'],
             [
                 'name' => 'السوبر أدمن',
-                'password' => Hash::make('Admin@12345'),
+                'password' => Hash::make('admin123'),
                 'role' => 'admin',
                 'area_id' => null,
             ],
         );
 
         $emails = [
-            'مدينة أبو حمص' => 'admin-abu-hummus@adhia.local',
+            'مدينة أبو حمص' => 'hommos@rowad.com',
             'جواد حسني' => 'admin-gawad-hosny@adhia.local',
             'دمسنا' => 'admin-damsna@adhia.local',
             'بركة غطاس' => 'admin-barakat-ghattas@adhia.local',
@@ -38,7 +38,7 @@ class AreaAdminSeeder extends Seeder
                 ['email' => $emails[$area->name] ?? 'admin-'.Str::slug($area->id.'-'.$area->name).'@adhia.local'],
                 [
                     'name' => 'أدمن '.$area->name,
-                    'password' => Hash::make('AreaAdmin@12345'),
+                    'password' => Hash::make('password123'),
                     'role' => 'admin',
                     'area_id' => $area->id,
                 ],
