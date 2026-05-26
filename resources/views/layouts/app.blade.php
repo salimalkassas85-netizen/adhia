@@ -266,6 +266,33 @@
             font-weight: 700;
             text-align: center;
         }
+
+        .whatsapp-float {
+            position: fixed;
+            right: 22px;
+            bottom: 22px;
+            z-index: 9999;
+            width: 58px;
+            height: 58px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #25D366;
+            color: #fff;
+            box-shadow: 0 14px 28px rgba(37, 211, 102, .34);
+            border: 3px solid rgba(255, 255, 255, .9);
+            transition: transform .2s ease, box-shadow .2s ease;
+        }
+        .whatsapp-float:hover {
+            transform: translateY(-3px) scale(1.04);
+            box-shadow: 0 18px 34px rgba(37, 211, 102, .42);
+        }
+        .whatsapp-float svg {
+            width: 31px;
+            height: 31px;
+            fill: currentColor;
+        }
         @keyframes floatGift {
             0%, 100% { margin-top: 0; }
             50% { margin-top: -10px; }
@@ -373,6 +400,12 @@
         @endauth
     </footer>
 </div>
+    <a class="whatsapp-float" href="https://wa.me/201122281723" target="_blank" rel="noopener noreferrer" aria-label="تواصل معنا عبر واتساب" title="تواصل معنا عبر واتساب">
+        <svg viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+            <path d="M19.11 17.37c-.27-.14-1.6-.79-1.85-.88-.25-.09-.43-.14-.61.14-.18.27-.7.88-.86 1.06-.16.18-.32.2-.59.07-.27-.14-1.15-.42-2.18-1.35-.81-.72-1.35-1.61-1.51-1.88-.16-.27-.02-.42.12-.56.12-.12.27-.32.41-.48.14-.16.18-.27.27-.45.09-.18.05-.34-.02-.48-.07-.14-.61-1.47-.84-2.01-.22-.53-.45-.46-.61-.47h-.52c-.18 0-.48.07-.73.34-.25.27-.95.93-.95 2.27s.97 2.63 1.11 2.81c.14.18 1.92 2.93 4.65 4.11.65.28 1.16.45 1.55.58.65.21 1.25.18 1.72.11.53-.08 1.6-.65 1.83-1.29.23-.63.23-1.17.16-1.29-.07-.11-.25-.18-.52-.32Z"/>
+            <path d="M16.02 3C8.85 3 3.02 8.82 3.02 15.98c0 2.29.6 4.53 1.75 6.5L3 29l6.68-1.75a12.93 12.93 0 0 0 6.34 1.65h.01C23.19 28.9 29 23.08 29 15.92 29 8.79 23.17 3 16.02 3Zm0 23.7h-.01a10.74 10.74 0 0 1-5.48-1.5l-.39-.23-3.96 1.04 1.06-3.86-.25-.4a10.72 10.72 0 0 1-1.65-5.77c0-5.9 4.8-10.7 10.7-10.7 2.85 0 5.53 1.11 7.55 3.13a10.6 10.6 0 0 1 3.13 7.52c-.01 5.9-4.81 10.7-10.7 10.7Z"/>
+        </svg>
+    </a>
 @stack('scripts')
 </body>
 </html>
