@@ -29,7 +29,13 @@ class BeneficiaryRequestController extends Controller
         abort_unless($scope->canAccessRequest($beneficiaryRequest), 403);
 
         return view('admin.beneficiary-requests.show', [
-            'request' => $beneficiaryRequest->load(['area', 'allocations.donation.assignedAdmin', 'statusLogs.user']),
+            'request' => $beneficiaryRequest->load([
+                'area',
+                'allocations' => fn ($query) => $query->latest(),
+                'allocations.donation.assignedAdmin',
+                'allocations.donation.donorArea',
+                'statusLogs.user',
+            ]),
         ]);
     }
 

@@ -6,6 +6,7 @@
         <p class="lead">تنظيم طلبات هدية العيد والمساهمات داخل مركز واحد، مع ستر كامل للبيانات وفصل تام بين المتبرعين ومستحقي هدية العيد.</p>
         <div class="actions">
             <a class="btn" href="{{ route('public.request.create') }}">طلب هدية العيد</a>
+            <a class="btn secondary" href="{{ route('public.request.status.form') }}">متابعة طلبك</a>
             <a class="btn gold" href="{{ route('public.donation.create') }}">المساهمة في الهدية</a>
         </div>
     </div>

@@ -363,6 +363,7 @@
                     <form method="post" action="{{ route('logout') }}">@csrf<button class="btn secondary" type="submit">خروج</button></form>
                 @else
                     <a href="{{ route('public.request.create') }}">طلب هدية العيد</a>
+                    <a href="{{ route('public.request.status.form') }}">متابعة طلب</a>
                     <a href="{{ route('public.donation.create') }}">المساهمة</a>
                     <a href="{{ route('login') }}">دخول الإدارة</a>
                 @endauth

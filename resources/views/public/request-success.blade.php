@@ -10,6 +10,10 @@
     @else
         <p class="notice">بانتظار ربط الطلب بمساهمة مناسبة داخل منطقتك.</p>
     @endif
+    <div class="actions">
+        <a class="btn" href="{{ route('public.request.status.show', $code) }}">متابعة التبرعات المرتبطة بالطلب</a>
+        <a class="btn secondary" href="{{ route('home') }}">العودة للرئيسية</a>
+    </div>
     <p class="privacy">لا تعرض هذه الصفحة العنوان أو الموقع حفاظًا على الخصوصية.</p>
 </div>
 @endsection

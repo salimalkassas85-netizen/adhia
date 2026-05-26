@@ -18,6 +18,9 @@ Route::get('/', HomeController::class)->name('home');
 Route::get('/request-gift', [BeneficiaryRequestController::class, 'create'])->name('public.request.create');
 Route::post('/request-gift', [BeneficiaryRequestController::class, 'store'])->middleware('throttle:10,1')->name('public.request.store');
 Route::get('/request-success/{code}', [BeneficiaryRequestController::class, 'success'])->name('public.request.success');
+Route::get('/request-status', [BeneficiaryRequestController::class, 'statusForm'])->name('public.request.status.form');
+Route::post('/request-status', [BeneficiaryRequestController::class, 'statusLookup'])->middleware('throttle:20,1')->name('public.request.status.lookup');
+Route::get('/request-status/{code}', [BeneficiaryRequestController::class, 'statusShow'])->name('public.request.status.show');
 
 Route::get('/donate', [DonationController::class, 'create'])->name('public.donation.create');
 Route::post('/donate', [DonationController::class, 'store'])->middleware('throttle:10,1')->name('public.donation.store');

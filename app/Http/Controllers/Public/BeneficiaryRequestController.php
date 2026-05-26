@@ -7,6 +7,7 @@ use App\Http\Requests\StoreBeneficiaryRequest;
 use App\Models\Area;
 use App\Models\BeneficiaryRequest;
 use App\Services\BeneficiaryRequestService;
+use Illuminate\Http\Request;
 
 class BeneficiaryRequestController extends Controller
 {
@@ -33,6 +34,44 @@ class BeneficiaryRequestController extends Controller
             'code' => $giftRequest->code,
             'status' => $linkedDonation?->status ?? $giftRequest->status,
             'linkedDonation' => $linkedDonation,
+        ]);
+    }
+
+    public function statusForm()
+    {
+        return view('public.request-status-form');
+    }
+
+    public function statusLookup(Request $request)
+    {
+        $validated = $request->validate([
+            'code' => ['required', 'string', 'max:50'],
+        ], [
+            'code.required' => 'من فضلك أدخل رقم الطلب.',
+        ]);
+
+        $code = trim($validated['code']);
+
+        return redirect()->route('public.request.status.show', $code);
+    }
+
+    public function statusShow(string $code)
+    {
+        $giftRequest = BeneficiaryRequest::query()
+            ->with(['area', 'allocations.donation' => fn ($query) => $query->latest()])
+            ->where('code', $code)
+            ->firstOrFail();
+
+        $donations = $giftRequest->allocations
+            ->pluck('donation')
+            ->filter()
+            ->reject(fn ($donation) => $donation->status === 'cancelled')
+            ->sortByDesc('created_at')
+            ->values();
+
+        return view('public.request-status', [
+            'giftRequest' => $giftRequest,
+            'donations' => $donations,
         ]);
     }
 

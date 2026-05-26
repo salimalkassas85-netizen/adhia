@@ -35,8 +35,10 @@ class DonationService
 
             $beneficiaryRequest = BeneficiaryRequest::find($data['selected_case_id']);
             $beneficiaryRequest?->forceFill([
+                'status' => 'pending',
                 'assigned_admin_id' => $donation->assigned_admin_id ?: $beneficiaryRequest->assigned_admin_id,
                 'assigned_at' => now(),
+                'delivered_at' => null,
             ])->save();
 
             $this->logs->log($donation, null, 'pending', 'تم إنشاء طلب توصيل واحد: استلام من المتبرع وتسليم للحالة المختارة.');
@@ -89,8 +91,10 @@ class DonationService
         ]);
 
         $allocation->beneficiaryRequest?->forceFill([
+            'status' => 'pending',
             'assigned_admin_id' => $donation->assigned_admin_id ?: auth()->id(),
             'assigned_at' => now(),
+            'delivered_at' => null,
         ])->save();
 
         $this->logs->log($donation, $donation->status, $donation->status, 'تم ربط المساهمة بطلب هدية واحد لتصبح طلب توصيل واحد.');
@@ -116,9 +120,15 @@ class DonationService
                 continue;
             }
 
+            $activeDonations = $beneficiaryRequest->donations()
+                ->where('donations.status', '!=', 'cancelled')
+                ->get();
+            $allActiveDonationsDelivered = $activeDonations->isNotEmpty()
+                && $activeDonations->every(fn (Donation $linkedDonation): bool => $linkedDonation->status === 'completed');
+
             $beneficiaryRequest->forceFill([
-                'status' => $status === 'completed' ? 'delivered' : 'pending',
-                'delivered_at' => $status === 'completed' ? now() : $beneficiaryRequest->delivered_at,
+                'status' => $allActiveDonationsDelivered ? 'delivered' : 'pending',
+                'delivered_at' => $allActiveDonationsDelivered ? now() : null,
             ])->save();
         }
     }
