@@ -21,12 +21,18 @@ class NewDonationAssigned extends Notification
 
     public function toArray(object $notifiable): array
     {
+        $donation = $this->donation->loadMissing('allocations.beneficiaryRequest');
+        $beneficiary = $donation->allocations->first()?->beneficiaryRequest;
+
         return [
-            'title' => 'مساهمة جديدة',
-            'body' => "مساهمة جديدة ({$this->donation->code}) في منطقتك. المطلوب الاستلام من المتبرع والتسليم للحالة المختارة.",
-            'url' => route('admin.donations.show', $this->donation),
+            'title' => 'مساهمة جديدة لمحتاج',
+            'body' => "مساهمة جديدة ({$donation->code}) وصلت لمحتاج في منطقتك. افتح صفحة المحتاج لعرض كل المتبرعين والاستلام منهم بدون لخبطة.",
+            'url' => $beneficiary
+                ? route('admin.beneficiary-requests.show', $beneficiary).'#donation-'.$donation->id
+                : route('admin.donations.index'),
             'type' => 'donation',
-            'donation_id' => $this->donation->id,
+            'donation_id' => $donation->id,
+            'beneficiary_request_id' => $beneficiary?->id,
         ];
     }
 }

@@ -37,7 +37,7 @@ class DashboardController extends Controller
             'notifications' => $user->unreadNotifications()->latest()->limit(8)->get(),
             'unreadNotificationsCount' => $user->unreadNotifications()->count(),
             'recentRequests' => (clone $requests)->with(['area', 'allocations.donation'])->latest()->limit(8)->get(),
-            'recentDonations' => (clone $donations)->with(['donorArea', 'targetArea'])->latest()->limit(8)->get(),
+            'recentDonations' => (clone $donations)->with(['donorArea', 'targetArea', 'allocations.beneficiaryRequest'])->latest()->limit(8)->get(),
             'donationsByArea' => (clone $donations)->selectRaw('target_area_id, count(*) as total')->groupBy('target_area_id')->with('targetArea')->get(),
             'requestsByArea' => (clone $requests)->selectRaw('area_id, count(*) as total')->groupBy('area_id')->with('area')->get(),
             'areas' => $areas,

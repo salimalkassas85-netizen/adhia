@@ -20,6 +20,11 @@
         ? 'completed'
         : ($readyDonations->isNotEmpty() ? 'received' : 'pending');
 @endphp
+@push('head')
+<style>
+    tr:target { outline: 2px solid var(--accent); outline-offset: -2px; background: rgba(201, 162, 39, .08); }
+</style>
+@endpush
 @section('content')
 <div class="grid grid-2">
     <div class="panel">
@@ -58,7 +63,7 @@
 
 <div class="panel" style="margin-top:18px">
     <h2>المتبرعون لهذا المحتاج</h2>
-    <p class="privacy">هذه البيانات تظهر لأدمن المنطقة فقط لأنه المسؤول عن الاستلام من المتبرعين والتسليم للمحتاج.</p>
+    <p class="privacy">اضغط على بيانات المتبرع داخل نفس الصفحة للوصول للهاتف والعنوان. لا توجد شاشة منفصلة للمساهمة حتى لا يحدث لخبطة.</p>
     <div class="table-responsive">
         <table class="table">
             <thead>
@@ -74,8 +79,8 @@
             </thead>
             <tbody>
             @forelse($linkedDonations as $donation)
-                <tr>
-                    <td><a href="{{ route('admin.donations.show', $donation) }}">{{ $donation->code }}</a></td>
+                <tr id="donation-{{ $donation->id }}" style="{{ request('donation') === $donation->code ? 'outline:2px solid var(--accent);' : '' }}">
+                    <td><strong>{{ $donation->code }}</strong></td>
                     <td>{{ $donation->donor_name ?? 'فاعل خير' }}</td>
                     <td><a href="tel:{{ $donation->donor_phone }}">{{ $donation->donor_phone }}</a></td>
                     <td>
@@ -95,6 +100,21 @@
                     </td>
                     <td><x-status-badge :status="$donation->status" /></td>
                     <td>
+                        <details style="margin-bottom:8px">
+                            <summary class="btn secondary" style="display:inline-block;cursor:pointer">بيانات المتبرع</summary>
+                            <div class="notice" style="margin-top:8px;text-align:right">
+                                <p><strong>الاسم:</strong> {{ $donation->donor_name ?? 'فاعل خير' }}</p>
+                                <p><strong>الهاتف:</strong> <a href="tel:{{ $donation->donor_phone }}">{{ $donation->donor_phone }}</a></p>
+                                <p><strong>المنطقة:</strong> {{ $donation->donorArea?->name ?? 'غير محددة' }}</p>
+                                <p><strong>عنوان الاستلام:</strong> {{ $donation->pickup_address ?? 'غير مذكور' }}</p>
+                                @if($donation->pickupMapsUrl())
+                                    <p><a target="_blank" rel="noopener" href="{{ $donation->pickupMapsUrl() }}">فتح موقع المتبرع</a></p>
+                                @endif
+                                @if($donation->notes)
+                                    <p><strong>ملاحظات:</strong> {{ $donation->notes }}</p>
+                                @endif
+                            </div>
+                        </details>
                         @if($donation->status === 'pending')
                             <form method="post" action="{{ route('admin.donations.receive', $donation) }}" onsubmit="return confirm('تأكيد استلام هذه المساهمة من المتبرع؟');">
                                 @csrf

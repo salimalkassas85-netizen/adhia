@@ -32,7 +32,13 @@
             <td><x-status-badge :status="$donation->status" /></td>
             <td>{{ $donation->assignedAdmin?->name ?? 'لم يتم تحديده' }}</td>
             <td>@if($donation->pickupMapsUrl())<a target="_blank" rel="noopener" href="{{ $donation->pickupMapsUrl() }}">فتح</a>@else - @endif</td>
-            <td><a class="btn secondary" href="{{ route('admin.donations.show',$donation) }}">إدارة</a></td>
+            <td>
+                @if($beneficiary)
+                    <a class="btn secondary" href="{{ route('admin.beneficiary-requests.show', $beneficiary) }}#donation-{{ $donation->id }}">فتح المحتاج</a>
+                @else
+                    <span class="privacy">غير مرتبط بمحتاج</span>
+                @endif
+            </td>
         </tr>
     @empty
         <tr><td colspan="10">لا توجد مساهمات مطابقة.</td></tr>

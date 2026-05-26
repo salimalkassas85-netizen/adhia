@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AllocateDonationRequest;
 use App\Http\Requests\UpdateDonationStatusRequest;
-use App\Models\Area;
 use App\Models\BeneficiaryRequest;
 use App\Models\Donation;
 use App\Services\DonationService;
@@ -71,16 +70,16 @@ class DonationController extends Controller
     {
         abort_unless($scope->canAccessDonation($donation), 403);
 
-        $areaId = $scope->areaId();
+        $donation->loadMissing('allocations.beneficiaryRequest');
+        $beneficiaryRequest = $donation->allocations->first()?->beneficiaryRequest;
 
-        return view('admin.donations.show', [
-            'donation' => $donation->load(['donorArea', 'targetArea', 'assignedAdmin', 'allocations.beneficiaryRequest.area', 'statusLogs.user']),
-            'areas' => Area::where('active', true)->when($areaId, fn ($query) => $query->where('id', $areaId))->orderBy('name')->get(),
-            'requests' => BeneficiaryRequest::query()
-                ->when($areaId, fn ($query) => $query->where('area_id', $areaId))
-                ->orderByDesc('created_at')
-                ->get(),
-        ]);
+        if (! $beneficiaryRequest) {
+            return redirect()
+                ->route('admin.donations.index')
+                ->with('status', 'هذه المساهمة غير مرتبطة بمحتاج بعد.');
+        }
+
+        return redirect(route('admin.beneficiary-requests.show', $beneficiaryRequest).'#donation-'.$donation->id);
     }
 
     public function confirm(Donation $donation, DonationService $service, AdminAreaScope $scope)

@@ -21,7 +21,7 @@ class DonationService
         $data['target_area_id'] = $data['donor_area_id'] ?? null;
 
         $donation = Donation::create($data);
-        $this->adminAssignments->assignDonation($donation);
+        $beneficiaryRequest = null;
 
         if (! empty($data['selected_case_id'])) {
             $areaId = $donation->target_area_id ?: $donation->donor_area_id;
@@ -34,17 +34,21 @@ class DonationService
             ]);
 
             $beneficiaryRequest = BeneficiaryRequest::find($data['selected_case_id']);
-            $beneficiaryRequest?->forceFill([
-                'status' => 'pending',
-                'assigned_admin_id' => $donation->assigned_admin_id ?: $beneficiaryRequest->assigned_admin_id,
-                'assigned_at' => now(),
-                'delivered_at' => null,
-            ])->save();
 
             $this->logs->log($donation, null, 'pending', 'تم إنشاء طلب توصيل واحد: استلام من المتبرع وتسليم للحالة المختارة.');
         }
 
-        return $donation;
+        // يتم توجيه الإشعار بعد ربط المساهمة بالمحتاج حتى يفتح أدمن المنطقة صفحة المحتاج مباشرة.
+        $this->adminAssignments->assignDonation($donation->fresh(['allocations.beneficiaryRequest']));
+
+        $beneficiaryRequest?->forceFill([
+            'status' => 'pending',
+            'assigned_admin_id' => $donation->fresh()->assigned_admin_id ?: $beneficiaryRequest->assigned_admin_id,
+            'assigned_at' => now(),
+            'delivered_at' => null,
+        ])->save();
+
+        return $donation->fresh(['allocations.beneficiaryRequest']);
     }
 
     public function setStatus(Donation $donation, string $status, ?string $note = null): Donation

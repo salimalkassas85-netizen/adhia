@@ -82,7 +82,14 @@
                     <td>{{ $donation->code }}</td>
                     <td>{{ $donation->targetArea?->name ?? $donation->donorArea?->name ?? 'تحتاج تخصيص' }}</td>
                     <td><x-status-badge :status="$donation->status" /></td>
-                    <td><a href="{{ route('admin.donations.show', $donation) }}">فتح</a></td>
+                    <td>
+                        @php $beneficiary = $donation->allocations->first()?->beneficiaryRequest; @endphp
+                        @if($beneficiary)
+                            <a href="{{ route('admin.beneficiary-requests.show', $beneficiary) }}#donation-{{ $donation->id }}">فتح المحتاج</a>
+                        @else
+                            <a href="{{ route('admin.donations.index') }}">المساهمات</a>
+                        @endif
+                    </td>
                 </tr>
             @empty
                 <tr><td colspan="4">لا توجد مساهمات بعد.</td></tr>

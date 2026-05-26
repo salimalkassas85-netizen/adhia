@@ -220,7 +220,7 @@ class EidInitiativeTest extends TestCase
         ]);
 
         $this->actingAs($admin)->get(route('admin.beneficiary-requests.show', $otherRequest))->assertForbidden();
-        $this->actingAs($admin)->get(route('admin.donations.show', $otherDonation))->assertForbidden();
+        $this->actingAs($admin)->post(route('admin.donations.receive', $otherDonation))->assertForbidden();
     }
 
     public function test_new_request_is_assigned_to_area_admin_with_notification(): void

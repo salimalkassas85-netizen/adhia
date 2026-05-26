@@ -46,7 +46,7 @@ class AdminAssignmentService
             $this->notifySuperAdmins(
                 'مساهمة بدون منطقة',
                 "لم يتم تحديد منطقة للمساهمة ({$donation->code}). يرجى التخصيص يدويًا.",
-                route('admin.donations.show', $donation),
+                $this->donationTargetUrl($donation),
             );
 
             return null;
@@ -58,7 +58,7 @@ class AdminAssignmentService
             $this->notifySuperAdmins(
                 'مساهمة بدون أدمن منطقة',
                 "لا يوجد أدمن لمنطقة المساهمة ({$donation->code}). يرجى تعيين أدمن للمنطقة.",
-                route('admin.donations.show', $donation),
+                $this->donationTargetUrl($donation),
             );
 
             return null;
@@ -75,10 +75,21 @@ class AdminAssignmentService
         $this->notifySuperAdmins(
             'مساهمة جديدة',
             "تم استقبال مساهمة جديدة ({$donation->code}) وتوجيهها لأدمن المنطقة المسؤول عن الاستلام والتسليم.",
-            route('admin.donations.show', $donation),
+            $this->donationTargetUrl($donation),
         );
 
         return $admin;
+    }
+
+
+    private function donationTargetUrl(Donation $donation): string
+    {
+        $donation->loadMissing('allocations.beneficiaryRequest');
+        $beneficiaryRequest = $donation->allocations->first()?->beneficiaryRequest;
+
+        return $beneficiaryRequest
+            ? route('admin.beneficiary-requests.show', $beneficiaryRequest).'#donation-'.$donation->id
+            : route('admin.donations.index');
     }
 
     public function areaAdmin(int $areaId): ?User
